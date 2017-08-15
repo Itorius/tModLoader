@@ -71,7 +71,7 @@ public class Installer
         Files.copy(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private static void messageBox(String message, int messageType)
+    public static void messageBox(String message, int messageType)
     {
         JOptionPane.showMessageDialog(null, message, "tModLoader Installer", messageType);
     }
