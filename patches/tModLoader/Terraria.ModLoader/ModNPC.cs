@@ -440,7 +440,7 @@ namespace Terraria.ModLoader
 		}
 
 		/// <summary>
-		/// Allows you to modify the damage, knockback, etc., that this NPC takes from a projectile.
+		/// Allows you to modify the damage, knockback, etc., that this NPC takes from a projectile. This method is only called for the owner of the projectile, meaning that in multi-player, projectiles owned by a player call this method on that client, and projectiles owned by the server such as enemy projectiles call this method on the server.
 		/// </summary>
 		/// <param name="projectile"></param>
 		/// <param name="damage"></param>
@@ -526,6 +526,15 @@ namespace Terraria.ModLoader
 		/// <param name="spriteBatch"></param>
 		/// <param name="drawColor"></param>
 		public virtual void PostDraw(SpriteBatch spriteBatch, Color drawColor) {
+		}
+
+		/// <summary>
+		/// When used in conjunction with "npc.hide = true", allows you to specify that this npc should be drawn behind certain elements. Add the index to one of Main.DrawCacheNPCsMoonMoon, DrawCacheNPCsOverPlayers, DrawCacheNPCProjectiles, or DrawCacheNPCsBehindNonSolidTiles.
+		/// </summary>
+		/// <param name="npc"></param>
+		/// <param name="index"></param>
+		public virtual void DrawBehind(int index)
+		{
 		}
 
 		/// <summary>

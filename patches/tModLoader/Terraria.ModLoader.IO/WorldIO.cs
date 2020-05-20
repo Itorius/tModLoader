@@ -165,7 +165,7 @@ namespace Terraria.ModLoader.IO
 					}
 				}
 				else {
-					((MysteryWorld)ModLoader.GetMod("ModLoader").GetModWorld("MysteryWorld")).mysteryNPCs.Add(tag);
+					ModContent.GetInstance<MysteryWorld>().mysteryNPCs.Add(tag);
 				}
 			}
 		}
@@ -193,7 +193,7 @@ namespace Terraria.ModLoader.IO
 					NPC.killCount[type] = tag.GetInt("count");
 				}
 				else {
-					((MysteryWorld)ModLoader.GetMod("ModLoader").GetModWorld("MysteryWorld")).mysteryKillCounts.Add(tag);
+					ModContent.GetInstance<MysteryWorld>().mysteryKillCounts.Add(tag);
 				}
 			}
 		}
@@ -294,7 +294,7 @@ namespace Terraria.ModLoader.IO
 					}
 				}
 				else {
-					((MysteryWorld)ModLoader.GetMod("ModLoader").GetModWorld("MysteryWorld")).data.Add(tag);
+					ModContent.GetInstance<MysteryWorld>().data.Add(tag);
 				}
 			}
 		}
@@ -311,6 +311,17 @@ namespace Terraria.ModLoader.IO
 				}
 				catch (IOException) {
 					Logging.tML.Error($"Above IOException error caused by {modWorld.Name} from the {modWorld.mod.Name} mod.");
+				}
+			}
+		}
+
+		public static void ValidateSigns() {
+			for (int i = 0; i < Main.sign.Length; i++) {
+				if (Main.sign[i] != null) {
+					Tile tile = Main.tile[Main.sign[i].x, Main.sign[i].y];
+					if (!(tile.active() && Main.tileSign[(int)tile.type])) {
+						Main.sign[i] = null;
+					}
 				}
 			}
 		}
@@ -448,7 +459,7 @@ namespace Terraria.ModLoader.IO
 						["name"] = name,
 						["legacyData"] = data
 					};
-					((MysteryWorld)ModLoader.GetMod("ModLoader").GetModWorld("MysteryWorld")).data.Add(tag);
+					ModContent.GetInstance<MysteryWorld>().data.Add(tag);
 				}
 			}
 		}

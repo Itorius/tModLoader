@@ -21,7 +21,7 @@ namespace ExampleMod
 	// This file contains 2 real ModConfigs (and also a bunch of fake ModConfigs showcasing various ideas). One is set to ConfigScope.ServerSide and the other ConfigScope.ClientSide
 	// ModConfigs contain Public Fields and Properties that represent the choices available to the user. 
 	// Those Fields or Properties will be presented to users in the Config menu.
-	// DONT use static members anywhere in this class (except for a variable named Instance, see below), tModLoader maintains several instances of ModConfig classes which will not work well with static properties or fields.
+	// DONT use static members anywhere in this class (except for an automatically assigned field named Instance with the same Type as the ModConfig class, if you'd rather write "MyConfigClass.Instance" instead of "ModContent.GetInstance<MyConfigClass>()"), tModLoader maintains several instances of ModConfig classes which will not work well with static properties or fields.
 
 	/// <summary>
 	/// ExampleConfigServer has Server-wide effects. Things that happen on the server, on the world, or influence autoload go here
@@ -60,9 +60,9 @@ namespace ExampleMod
 		[ReloadRequired]
 		public bool DisableExampleWings { get; set; }
 
-		[Label("Disable Volcanos")]
+		[Label("Disable Volcanoes")]
 		// Our game logic can handle toggling this setting in-game, so you'll notice we do NOT decorate this property with ReloadRequired
-		public bool DisableVolcanos { get; set; }
+		public bool DisableVolcanoes { get; set; }
 
 		// Watch in action: https://gfycat.com/SickTerribleHoatzin
 		[Label("Example Person free gift list")]
@@ -149,11 +149,21 @@ namespace ExampleMod
 			[new PrefixDefinition("ExampleMod", "ReallyAwesome")] = 0.8f
 		};
 
+		// Using a custom class as a key in a Dictionary. When used as a Dictionary Key, special code must be used.
+		public Dictionary<ClassUsedAsKey, Color> CustomKey = new Dictionary<ClassUsedAsKey, Color>();
+
 		public ModConfigShowcaseDataTypes() {
 			// Doing the initialization of defaults for reference types in a constructor is also acceptable.
 			SomeClassA = new SimpleData() {
 				percent = .85f
 			};
+
+			CustomKey.Add(new ClassUsedAsKey() {
+				SomeBool = true,
+				SomeNumber = 42
+			},
+			new Color(1, 2, 3, 4));
+
 			itemDefinitionExample = new ItemDefinition("Terraria GoldOre"); // EntityDefinition uses ItemID field names rather than the numbers themselves for readability.
 		}
 	}
@@ -295,8 +305,8 @@ namespace ExampleMod
 		public string[] ArrayOfString;
 
 		[DrawTicks]
-		[OptionStrings(new string[] { "Pikachu", "Charmander", "Bulbasor", "Squirtle" })]
-		[DefaultValue("Bulbasor")]
+		[OptionStrings(new string[] { "Pikachu", "Charmander", "Bulbasaur", "Squirtle" })]
+		[DefaultValue("Bulbasaur")]
 		public string FavoritePokemon;
 
 		// DefaultListValue provides the default value to be added when the user clicks add in the UI.
@@ -306,7 +316,7 @@ namespace ExampleMod
 		[DefaultListValue(typeof(Vector2), "0.1, 0.2")]
 		public List<Vector2> ListOfVector2 = new List<Vector2>();
 
-		// JsonDefaultListValue provides the default value for referece types/classes, expressed as JSON. If you are unsure of the JSON, you can copy from a saved config file itself.
+		// JsonDefaultListValue provides the default value for reference types/classes, expressed as JSON. If you are unsure of the JSON, you can copy from a saved config file itself.
 		[JsonDefaultListValue("{\"name\": \"GoldBar\"}")]
 		public List<ItemDefinition> ListOfItemDefinition = new List<ItemDefinition>();
 
@@ -510,7 +520,7 @@ namespace ExampleMod
 		public Corner corner;
 
 		// You can put multiple attributes in the same [] if you like.
-		// ColorHueSliderAttribute displayes Hue Saturation Lightness. Passing in false means only Hue is shown.
+		// ColorHueSliderAttribute displays Hue Saturation Lightness. Passing in false means only Hue is shown.
 		[DefaultValue(typeof(Color), "255, 0, 0, 255"), ColorHSLSlider(false), ColorNoAlpha]  
 		public Color hsl;
 
@@ -527,7 +537,7 @@ namespace ExampleMod
 		public List<Pair> ListOfPair2 = new List<Pair>();
 		public Pair pairExample2 = new Pair();
 
-		public SimpleData simpleDataExample; // you can also initialize in the constructor, see initailization in public ModConfigShowcaseMisc() below.
+		public SimpleData simpleDataExample; // you can also initialize in the constructor, see initialization in public ModConfigShowcaseMisc() below.
 
 		// This annotation allows the UI to null out this class. You need to make sure to initialize fields without the NullAllowed annotation in constructor or initializer or you might have issues. Of course, if you allow nulls, you'll need to make sure the rest of your mod will handle them correctly. Try to avoid null unless you have a good reason to use them, as null objects will only complicate the rest of your code.
 		[NullAllowed] 
@@ -628,12 +638,12 @@ namespace ExampleMod
 		public bool enabled;
 
 		[DrawTicks]
-		[OptionStrings(new string[] { "Pikachu", "Charmander", "Bulbasor", "Squirtle" })]
-		[DefaultValue("Bulbasor")]
+		[OptionStrings(new string[] { "Pikachu", "Charmander", "Bulbasaur", "Squirtle" })]
+		[DefaultValue("Bulbasaur")]
 		public string FavoritePokemon;
 
 		public SimpleData() {
-			FavoritePokemon = "Bulbasor";
+			FavoritePokemon = "Bulbasaur";
 		}
 
 		public override bool Equals(object obj) {
@@ -666,6 +676,49 @@ namespace ExampleMod
 
 		public override int GetHashCode() {
 			return new { ListOfInts, nestedSimple, IncrementalFloat }.GetHashCode();
+		}
+	}
+
+	[TypeConverter(typeof(ToFromStringConverter<ClassUsedAsKey>))]
+	public class ClassUsedAsKey
+	{
+		// When you save data from a dictionary into a file (json), you need to represent the key as a string
+		// But to get the object back, you need a TypeConverter, and this example shows how to implement one
+
+		// You start with the [TypeConverter(typeof(ToFromStringConverter<NameOfClassHere>))] attribute above the class
+		// For this to work, you need the usual Equals and GetHashCode overrides as explained in the other examples,
+		// plus ToString and FromString, which are used to transform your object into a string and back
+
+		public bool SomeBool { get; set; }
+		public int SomeNumber { get; set; }
+
+		public override bool Equals(object obj) {
+			if (obj is ClassUsedAsKey other)
+				return SomeBool == other.SomeBool && SomeNumber == other.SomeNumber;
+			return base.Equals(obj);
+		}
+
+		public override int GetHashCode() {
+			return new { SomeBool, SomeNumber }.GetHashCode();
+		}
+
+		// Here you need to write how the string representation of your object will look like so it is easy to reconstruct again
+		// Inside the json file, it will look something like this: "True, 5"
+		public override string ToString() {
+			return $"{SomeBool}, {SomeNumber}";
+		}
+
+		// Here you need to create an object from the given string (reverting ToString basically)
+		// This has to be static and it must be named FromString
+		public static ClassUsedAsKey FromString(string s)
+		{
+			// This following code depends on your implementation of ToString, here we just have two values separated by a ','
+			string[] vars = s.Split(new char[] { ',' }, 2, StringSplitOptions.RemoveEmptyEntries);
+			// The System.Convert class provides methods to transform data types between each other, here using the string overload
+			return new ClassUsedAsKey {
+				SomeBool = Convert.ToBoolean(vars[0]),
+				SomeNumber = Convert.ToInt32(vars[1])
+			};
 		}
 	}
 

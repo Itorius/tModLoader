@@ -114,9 +114,9 @@ namespace ExampleMod.Tiles
 
 		public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction) {
 			//Main.NewText("i " + i + " j " + j + " t " + type + " s " + style + " d " + direction);
-			if (Main.netMode == 1) {
+			if (Main.netMode == NetmodeID.MultiplayerClient) {
 				NetMessage.SendTileSquare(Main.myPlayer, i, j, 3);
-				NetMessage.SendData(87, -1, -1, null, i, j, Type, 0f, 0, 0, 0);
+				NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type, 0f, 0, 0, 0);
 				return -1;
 			}
 			return Place(i, j);
@@ -129,6 +129,7 @@ namespace ExampleMod.Tiles
 		public override void SetDefaults() {
 			Main.tileFrameImportant[Type] = true;
 			Main.tileLavaDeath[Type] = true;
+			TileID.Sets.FramesOnKillWall[Type] = true; // Necessary since we have a placement that uses AnchorWall
 
 			TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
 			// We set processedCoordinates to true so our Hook_AfterPlacement gets top left coordinates, regardless of Origin.
@@ -173,7 +174,7 @@ namespace ExampleMod.Tiles
 
 		public override bool NewRightClick(int i, int j) {
 			Tile tile = Main.tile[i, j];
-			int left = i - tile.frameX / 18;
+			int left = i - tile.frameX % 36 / 18;
 			int top = j - tile.frameY / 18;
 
 			int index = GetInstance<TEScoreBoard>().Find(left, top);

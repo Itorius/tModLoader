@@ -24,7 +24,7 @@ namespace ExampleMod.Items
 			item.width = 20;
 			item.height = 20;
 			item.value = 100;
-			item.rare = 1;
+			item.rare = ItemRarityID.Blue;
 		}
 
 		public override Color? GetAlpha(Color lightColor) {
@@ -55,10 +55,6 @@ namespace ExampleMod.Items
 
 			// You can also remove a specific line, if you have access to that object:
 			//tooltips.Remove(tooltipLine);
-
-			// You can also remove a range from the list
-			// For example, this would remove the first 4 lines:
-			//tooltips.RemoveRange(0, 4);
 		}
 
 		public override void AddRecipes() {

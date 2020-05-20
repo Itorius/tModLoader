@@ -16,12 +16,14 @@ using System.Threading;
 using Terraria.Localization;
 using Terraria.ModLoader.Core;
 using Microsoft.Xna.Framework;
+using Terraria.ModLoader.UI;
 
 namespace Terraria.ModLoader
 {
 	public static class Logging
 	{
 		public static readonly string LogDir = Path.Combine(Program.SavePath, "Logs");
+		public static readonly string LogArchiveDir = Path.Combine(LogDir, "Old");
 		public static string LogPath { get; private set; }
 
 		internal static ILog Terraria { get; } = LogManager.GetLogger("Terraria");
@@ -43,7 +45,7 @@ namespace Terraria.ModLoader
 
 			ConfigureAppenders();
 
-			tML.InfoFormat("Starting {0} {1} {2}", ModLoader.versionedName, ReLogic.OS.Platform.Current.Type, side);
+			tML.InfoFormat("Starting {0} {1} {2} ({3})", ModLoader.versionedName, ReLogic.OS.Platform.Current.Type, side, DateTime.Now.ToString("d"));
 			tML.InfoFormat("Running on {0} {1}", FrameworkVersion.Framework, FrameworkVersion.Version);
 			tML.InfoFormat("Executable: {0}", Assembly.GetEntryAssembly().Location);
 			tML.InfoFormat("Working Directory: {0}", Path.GetFullPath(Directory.GetCurrentDirectory()));
@@ -156,6 +158,7 @@ namespace Terraria.ModLoader
 			"Terraria.Net.Sockets.TcpSocket.Terraria.Net.Sockets.ISocket.AsyncSend", // client disconnects from server
 			"System.Diagnostics.Process.Kill", // attempt to kill non-started process when joining server
 			"Terraria.ModLoader.Core.AssemblyManager.CecilAssemblyResolver.Resolve",
+			"Terraria.ModLoader.Engine.TMLContentManager.OpenStream" // TML content manager delegating to vanilla dir
 		};
 
 		// there are a couple of annoying messages that happen during cancellation of asynchronous downloads
@@ -186,21 +189,33 @@ namespace Terraria.ModLoader
 			if (handlerActive.Value)
 				return;
 
+			bool oom = args.Exception is OutOfMemoryException;
+
+			//In case of OOM, unload the Main.tile array and do immediate garbage collection.
+			//If we don't do this, there will be a big chance that this method will fail to even quit the game, due to another OOM exception being thrown.
+			if (oom) {
+				Main.tile = null;
+
+				GC.Collect();
+			}
+
 			try {
 				handlerActive.Value = true;
 
-				if (args.Exception == previousException ||
-					args.Exception is ThreadAbortException ||
-					ignoreSources.Contains(args.Exception.Source) ||
-					ignoreMessages.Any(str => args.Exception.Message?.Contains(str) ?? false) ||
-					ignoreThrowingMethods.Any(str => args.Exception.StackTrace?.Contains(str) ?? false))
-					return;
+				if (!oom) {
+					if (args.Exception == previousException ||
+						args.Exception is ThreadAbortException ||
+						ignoreSources.Contains(args.Exception.Source) ||
+						ignoreMessages.Any(str => args.Exception.Message?.Contains(str) ?? false) ||
+						ignoreThrowingMethods.Any(str => args.Exception.StackTrace?.Contains(str) ?? false))
+						return;
+				}
 
 				var stackTrace = new StackTrace(true);
 				PrettifyStackTraceSources(stackTrace.GetFrames());
 				var traceString = stackTrace.ToString();
 
-				if (ignoreContents.Any(traceString.Contains))
+				if (!oom && ignoreContents.Any(traceString.Contains))
 					return;
 
 				traceString = traceString.Substring(traceString.IndexOf('\n'));
@@ -221,6 +236,13 @@ namespace Terraria.ModLoader
 				Console.ResetColor();
 	#endif
 				tML.Warn(Language.GetTextValue("tModLoader.RuntimeErrorSilentlyCaughtException") + '\n' + exString);
+
+				if (oom) {
+					const string error = "Game ran out of memory. You'll have to find which mod is consuming lots of memory, and contact the devs or remove it.";
+					Logging.tML.Fatal(error);
+					Interface.MessageBoxShow(error);
+					Environment.Exit(1);
+				}
 			}
 			catch (Exception e) {
 				tML.Warn("FirstChanceExceptionHandler exception", e);

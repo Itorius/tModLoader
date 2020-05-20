@@ -302,7 +302,7 @@ namespace ExampleMod
 			}
 			if (newPosition != player.position) {
 				player.Teleport(newPosition, 1, 0);
-				NetMessage.SendData(65, -1, -1, null, 0, player.whoAmI, newPosition.X, newPosition.Y, 1, 0, 0);
+				NetMessage.SendData(MessageID.Teleport, -1, -1, null, 0, player.whoAmI, newPosition.X, newPosition.Y, 1, 0, 0);
 				PuritySpiritDebuff();
 			}
 		}
@@ -449,6 +449,7 @@ namespace ExampleMod
 				}
 				customDamage = true;
 			}
+			if (blockyAccessory) playSound = false;
 			constantDamage = 0;
 			percentDamage = 0f;
 			defenseEffect = -1f;
@@ -456,6 +457,7 @@ namespace ExampleMod
 		}
 
 		public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
+			if (blockyAccessory) Main.PlaySound(SoundID.Zombie, player.position, 13);
 			if (elementShield && damage > 1.0) {
 				if (elementShields < 6) {
 					int k;
@@ -496,12 +498,18 @@ namespace ExampleMod
 					}
 				}
 			}
+			if (player.mount._mountSpecificData is Mounts.Car.CarSpecificData balloons) {
+				if (balloons.count > 0) {
+					balloons.count--;
+					Main.PlaySound(SoundID.Item38, player.position);
+				}
+			}
 		}
 
 		public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource) {
 			if (heroLives > 0) {
 				heroLives--;
-				if (Main.netMode == 1) {
+				if (Main.netMode == NetmodeID.MultiplayerClient) {
 					ModPacket packet = mod.GetPacket();
 					packet.Write((byte)ExampleModMessageType.HeroLives);
 					packet.Write(player.whoAmI);

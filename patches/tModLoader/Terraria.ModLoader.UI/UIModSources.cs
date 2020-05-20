@@ -120,6 +120,10 @@ namespace Terraria.ModLoader.UI
 		private void ManagePublished(UIMouseEvent evt, UIElement listeningElement) {
 			Main.PlaySound(11, -1, -1, 1);
 			Main.menuMode = Interface.managePublishedID;
+			if (ModLoader.modBrowserPassphrase == string.Empty) {
+				Main.menuMode = Interface.enterPassphraseMenuID;
+				Interface.enterPassphraseMenu.SetGotoMenu(Interface.managePublishedID);
+			}
 		}
 
 		private void BackClick(UIMouseEvent evt, UIElement listeningElement) {
@@ -129,8 +133,12 @@ namespace Terraria.ModLoader.UI
 
 		private void OpenSources(UIMouseEvent evt, UIElement listeningElement) {
 			Main.PlaySound(10, -1, -1, 1);
-			Directory.CreateDirectory(ModCompile.ModSourcePath);
-			Process.Start(ModCompile.ModSourcePath);
+			try {
+				Directory.CreateDirectory(ModCompile.ModSourcePath);
+				Process.Start(ModCompile.ModSourcePath);
+			} catch(Exception e) {
+				Logging.tML.Error(e);
+			}
 		}
 
 		private void BuildMods(UIMouseEvent evt, UIElement listeningElement) {
