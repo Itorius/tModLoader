@@ -1,5 +1,33 @@
 --- src/Terraria/Terraria/GameContent/UI/Elements/UIKeybindingListItem.cs
 +++ src/tModLoader/Terraria/GameContent/UI/Elements/UIKeybindingListItem.cs
+@@ -23,12 +_,12 @@
+ 		}
+ 
+ 		public void OnClickMethod(UIMouseEvent evt, UIElement listeningElement) {
+-			if (PlayerInput.ListeningTrigger != _keybind) {
+-				if (PlayerInput.CurrentProfile.AllowEditting)
+-					PlayerInput.ListenFor(_keybind, _inputmode);
+-				else
+-					PlayerInput.ListenFor(null, _inputmode);
+-			}
++			// if (PlayerInput.ListeningTrigger != _keybind) {
++				// if (PlayerInput.CurrentProfile.AllowEditting)
++					// PlayerInput.ListenFor(_keybind, _inputmode);
++				// else
++					// PlayerInput.ListenFor(null, _inputmode);
++			// }
+ 		}
+ 
+ 		protected override void DrawSelf(SpriteBatch spriteBatch) {
+@@ -37,7 +_,7 @@
+ 			CalculatedStyle dimensions = GetDimensions();
+ 			float num2 = dimensions.Width + 1f;
+ 			Vector2 vector = new Vector2(dimensions.X, dimensions.Y);
+-			bool flag = PlayerInput.ListeningTrigger == _keybind;
++			bool flag = /*PlayerInput.ListeningTrigger == _keybind*/false;
+ 			Vector2 baseScale = new Vector2(0.8f);
+ 			Color value = flag ? Color.Gold : (base.IsMouseHovering ? Color.White : Color.Silver);
+ 			value = Color.Lerp(value, Color.White, base.IsMouseHovering ? 0.5f : 0f);
 @@ -104,6 +_,12 @@
  					return Lang.menu[162].Value;
  				case "MouseRight":

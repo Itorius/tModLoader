@@ -1094,6 +1094,15 @@
  					if (gameMenu)
  						UpdateMenu();
  
+@@ -12635,7 +_,7 @@
+ 				DoUpdate_F7_ToggleGraphicsDiagnostics();
+ 				DoUpdate_F11_ToggleUI();
+ 				DoUpdate_AltEnter_ToggleFullscreen();
+-				DoUpdate_HandleInput();
++				DoUpdate_HandleInput(gameTime);
+ 				DoUpdate_HandleChat();
+ 				DoUpdate_Enter_ToggleChat();
+ 				if (gameMenu) {
 @@ -12705,6 +_,7 @@
  				Sandstorm.EmitDust();
  			}
@@ -1194,14 +1203,32 @@
  				ChatMessage message = ChatManager.Commands.CreateOutgoingMessage(chatText);
  				if (netMode == 1)
  					ChatHelper.SendChatMessageFromClient(message);
-@@ -13410,6 +_,7 @@
+@@ -13408,15 +_,16 @@
+ 			SoundEngine.PlaySound(11);
+ 		}
  
- 		private void DoUpdate_HandleInput() {
- 			PlayerInput.UpdateInput();
-+			ModHooks.PostUpdateInput();
- 			UpdateViewZoomKeys();
- 			PlayerInput.SetZoom_Unscaled();
- 			UILinkPointNavigator.Update();
+-		private void DoUpdate_HandleInput() {
+-			PlayerInput.UpdateInput();
+-			UpdateViewZoomKeys();
+-			PlayerInput.SetZoom_Unscaled();
+-			UILinkPointNavigator.Update();
+-			PlayerInput.CacheMousePositionForZoom();
+-			PlayerInput.SetZoom_MouseInWorld();
+-			oldKeyState = keyState;
+-			keyState = Keyboard.GetState();
++		private void DoUpdate_HandleInput(GameTime gameTime) {
++			PlayerInput.UpdateInput(gameTime);
++			// ModHooks.PostUpdateInput();
++			// UpdateViewZoomKeys();
++			// PlayerInput.SetZoom_Unscaled();
++			// UILinkPointNavigator.Update();
++			// PlayerInput.CacheMousePositionForZoom();
++			// PlayerInput.SetZoom_MouseInWorld();
++			// oldKeyState = keyState;
++			// keyState = Keyboard.GetState();
+ 		}
+ 
+ 		private static void DoUpdate_AltEnter_ToggleFullscreen() {
 @@ -14058,6 +_,7 @@
  			if (tileFrameCounter[493] < 0)
  				tileFrameCounter[493] += 120;
@@ -3048,6 +3075,14 @@
  		}
  
  		private void DoDraw(GameTime gameTime) {
+@@ -46681,7 +_,6 @@
+ 			_drawCycleCounter = (_drawCycleCounter + 1) % 5uL;
+ 			MenuUI.IsVisible = (gameMenu && menuMode == 888);
+ 			InGameUI.IsVisible = (!gameMenu && InGameUI.CurrentState != null);
+-			PlayerInput.UpdateMainMouse();
+ 			RefreshPlayerDrawOrder();
+ 			CaptureManager.Instance.DrawTick();
+ 			TimeLogger.NewDrawFrame();
 @@ -46963,8 +_,8 @@
  			UpdateAtmosphereTransparencyToSkyColor();
  			base.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);

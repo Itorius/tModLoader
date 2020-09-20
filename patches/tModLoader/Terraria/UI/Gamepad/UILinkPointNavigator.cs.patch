@@ -8,3 +8,14 @@
  			public static int FANCYUI_HIGHEST_INDEX = 1;
  			public static int FANCYUI_SPECIAL_INSTRUCTIONS = 0;
  			public static int INFOACCCOUNT = 0;
+@@ -109,8 +_,8 @@
+ 					flag = false;
+ 			}
+ 
+-			if (flag && PlayerInput.NavigatorRebindingLock > 0)
++			// if (flag && PlayerInput.NavigatorRebindingLock > 0)
+-				flag = false;
++				// flag = false;
+ 
+ 			if (flag && !Main.gameMenu && !PlayerInput.UsingGamepadUI)
+ 				flag = false;
