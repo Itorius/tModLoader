@@ -248,13 +248,14 @@
  		}
  
 -		public static void UpdateInput() {
+-			Triggers.Reset();
+-			ScrollWheelValueOld = ScrollWheelValue;
+-			ScrollWheelValue = 0;
 +		public static void UpdateInput(GameTime gameTime) {
 +			if (reinitialize)
 +				ReInitialize();
 +
- 			Triggers.Reset();
--			ScrollWheelValueOld = ScrollWheelValue;
--			ScrollWheelValue = 0;
++			// Triggers.Reset();
 +			// ScrollWheelValueOld = ScrollWheelValue;
 +			// ScrollWheelValue = 0;
  			GamepadThumbstickLeft = Vector2.Zero;
@@ -286,6 +287,7 @@
  			VerifyBuildingMode();
 -			MouseInput();
 -			int num = 0 | (KeyboardInput() ? 1 : 0) | (GamePadInput() ? 1 : 0);
+-			Triggers.Update();
 +			// MouseInput();
 +
 +			Input.Update(gameTime);
@@ -294,7 +296,7 @@
 +			for (int l = 0; l < MouseKeys.Count; l++) keyConfiguration.Processkey(Triggers.Current, MouseKeys[l]);
 +
 +			// int num = 0 /*| (KeyboardInput() ? 1 : 0)*/ | (GamePadInput() ? 1 : 0);
- 			Triggers.Update();
++			// Triggers.Update();
  			PostInput();
 -			ScrollWheelDelta = ScrollWheelValue - ScrollWheelValueOld;
 -			ScrollWheelDeltaForUI = ScrollWheelDelta;
@@ -336,7 +338,7 @@
  		}
  
  		private static void CacheOriginalInput() {
-@@ -561,431 +_,433 @@
+@@ -561,439 +_,325 @@
  			_originalScreenHeight = Main.screenHeight;
  		}
  
@@ -765,6 +767,9 @@
 -
 -			return flag4;
 -		}
+-
+-		private static void DebugKeys(List<Keys> keys) {
+-		}
 +		// private static bool GamePadInput() {
 +		// 	bool flag = false;
 +		// 	ScrollWheelValue += GamepadScrollValue;
@@ -1076,126 +1081,8 @@
 +		//
 +		// 	return flag;
 +		// }
-+
-+		// private static void MouseInput() {
-+		// bool flag = false;
-+		// MouseInfoOld = MouseInfo;
-+		// MouseInfo = Mouse.GetState();
-+		// ScrollWheelValue += MouseInfo.ScrollWheelValue;
-+		// if (MouseInfo.X != MouseInfoOld.X || MouseInfo.Y != MouseInfoOld.Y || MouseInfo.ScrollWheelValue != MouseInfoOld.ScrollWheelValue) {
-+		// 	MouseX = (int)((float)MouseInfo.X * RawMouseScale.X);
-+		// 	MouseY = (int)((float)MouseInfo.Y * RawMouseScale.Y);
-+		// 	flag = true;
-+		// }
-+		//
-+		// MouseKeys.Clear();
-+		// if (Main.instance.IsActive) {
-+		// 	if (MouseInfo.LeftButton == ButtonState.Pressed) {
-+		// 		MouseKeys.Add("Mouse1");
-+		// 		flag = true;
-+		// 	}
-+		//
-+		// 	if (MouseInfo.RightButton == ButtonState.Pressed) {
-+		// 		MouseKeys.Add("Mouse2");
-+		// 		flag = true;
-+		// 	}
-+		//
-+		// 	if (MouseInfo.MiddleButton == ButtonState.Pressed) {
-+		// 		MouseKeys.Add("Mouse3");
-+		// 		flag = true;
-+		// 	}
-+		//
-+		// 	if (MouseInfo.XButton1 == ButtonState.Pressed) {
-+		// 		MouseKeys.Add("Mouse4");
-+		// 		flag = true;
-+		// 	}
-+		//
-+		// 	if (MouseInfo.XButton2 == ButtonState.Pressed) {
-+		// 		MouseKeys.Add("Mouse5");
-+		// 		flag = true;
-+		// 	}
-+		// }
-+		//
-+		// if (flag) {
-+		// 	CurrentInputMode = InputMode.Mouse;
-+		// 	Triggers.Current.UsedMovementKey = false;
-+		// }
-+		// }
-+
-+		// private static bool KeyboardInput() {
-+		// bool flag = false;
-+		// bool flag2 = false;
-+		// List<Keys> pressedKeys = GetPressedKeys();
-+		// DebugKeys(pressedKeys);
-+		// if (pressedKeys.Count == 0 && MouseKeys.Count == 0)
-+		// 	return false;
-+		//
-+		// for (int i = 0; i < pressedKeys.Count; i++) {
-+		// 	if (pressedKeys[i] == Keys.LeftShift || pressedKeys[i] == Keys.RightShift)
-+		// 		flag = true;
-+		// 	else if (pressedKeys[i] == Keys.LeftAlt || pressedKeys[i] == Keys.RightAlt)
-+		// 		flag2 = true;
-+		//
-+		// 	Main.ChromaPainter.PressKey(pressedKeys[i]);
-+		// }
-+		//
-+		// if (Main.blockKey != Keys.None.ToString()) {
-+		// 	bool flag3 = false;
-+		// 	for (int j = 0; j < pressedKeys.Count; j++) {
-+		// 		if (pressedKeys[j].ToString() == Main.blockKey) {
-+		// 			pressedKeys[j] = Keys.None;
-+		// 			flag3 = true;
-+		// 		}
-+		// 	}
-+		//
-+		// 	if (!flag3)
-+		// 		Main.blockKey = Keys.None.ToString();
-+		// }
-+		//
-+		// KeyConfiguration keyConfiguration = CurrentProfile.InputModes[InputMode.Keyboard];
-+		// if (Main.gameMenu && !WritingText)
-+		// 	keyConfiguration = CurrentProfile.InputModes[InputMode.KeyboardUI];
-+		//
-+		// List<string> list = new List<string>(pressedKeys.Count);
-+		// for (int k = 0; k < pressedKeys.Count; k++) {
-+		// 	list.Add(pressedKeys[k].ToString());
-+		// }
-+		//
-+		// if (WritingText)
-+		// 	list.Clear();
-+		//
-+		// int count = list.Count;
-+		// list.AddRange(MouseKeys);
-+		// bool flag4 = false;
-+		// for (int l = 0; l < list.Count; l++) {
-+		// 	if (l < count && pressedKeys[l] == Keys.None)
-+		// 		continue;
-+		//
-+		// 	string newKey = list[l];
-+		// 	if (!(list[l] == Keys.Tab.ToString()) || !((flag && SocialAPI.Mode == SocialMode.Steam) || flag2)) {
-+		// 		if (CheckRebindingProcessKeyboard(newKey))
-+		// 			return false;
-+		//
-+		// 		_ = Main.oldKeyState;
-+		// 		if (l >= count || !Main.oldKeyState.IsKeyDown(pressedKeys[l]))
-+		// 			keyConfiguration.Processkey(Triggers.Current, newKey);
-+		// 		else
-+		// 			keyConfiguration.CopyKeyState(Triggers.Old, Triggers.Current, newKey);
-+		//
-+		// 		if (l >= count || pressedKeys[l] != 0)
-+		// 			flag4 = true;
-+		// 	}
-+		// }
-+		//
-+		// if (flag4)
-+		// 	CurrentInputMode = InputMode.Keyboard;
-+		//
-+		// return flag4;
-+		// }
  
- 		private static void DebugKeys(List<Keys> keys) {
- 		}
-@@ -994,6 +_,9 @@
+ 		private static void FixDerpedRebinds() {
  			List<string> list = new List<string> {
  				"MouseLeft",
  				"MouseRight",

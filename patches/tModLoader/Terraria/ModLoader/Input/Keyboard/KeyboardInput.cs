@@ -6,7 +6,7 @@ using Terraria;
 
 namespace Terraria.ModLoader.Input.Keyboard
 {
-	public class KeyboardEvents
+	public class KeyboardInput
 	{
 		private static List<KeySequence> keySequences;
 

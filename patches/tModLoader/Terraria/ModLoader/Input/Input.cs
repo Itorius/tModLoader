@@ -10,11 +10,18 @@ namespace Terraria.ModLoader.Input
 		private static int lastScreenWidth;
 		private static int lastScreenHeight;
 
+		private static KeyConfiguration KeyConfiguration {
+			get {
+				if (Main.gameMenu && !PlayerInput.WritingText) return PlayerInput.CurrentProfile.InputModes[InputMode.KeyboardUI];
+				return PlayerInput.CurrentProfile.InputModes[InputMode.Keyboard];
+			}
+		}
+
 		// todo: implement layer system
 		internal static void Load() {
 			MouseInput.Load();
-			KeyboardEvents.Load();
-			KeyboardEvents.RepeatDelay = 31;
+			KeyboardInput.Load();
+			KeyboardInput.RepeatDelay = 31;
 
 			MouseInput.MouseMoved += args => {
 				PlayerInput.MouseX = (int)(args.X * PlayerInput.RawMouseScale.X);
@@ -95,6 +102,22 @@ namespace Terraria.ModLoader.Input
 				PlayerInput.Triggers.Current.UsedMovementKey = false;
 			};
 
+			KeyboardInput.KeyPressed += args => {
+				foreach (var pair in KeyConfiguration.KeyStatus) {
+					if (pair.Value.Contains(args.Key.ToString())) {
+						PlayerInput.Triggers.Current.KeyStatus[pair.Key] = true;
+					}
+				}
+			};
+
+			KeyboardInput.KeyReleased += args => {
+				foreach (var pair in KeyConfiguration.KeyStatus) {
+					if (pair.Value.Contains(args.Key.ToString())) {
+						PlayerInput.Triggers.Current.KeyStatus[pair.Key] = false;
+					}
+				}
+			};
+
 			// MouseInput.ButtonDoubleClicked += args =>
 			// {
 			// 	foreach (Layer layer in Layers)
@@ -173,7 +196,7 @@ namespace Terraria.ModLoader.Input
 			}
 
 			MouseInput.Update(time);
-			KeyboardEvents.Update(time);
+			KeyboardInput.Update(time);
 		}
 	}
 }
