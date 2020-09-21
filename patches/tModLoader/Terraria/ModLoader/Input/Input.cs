@@ -1,5 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Terraria.Audio;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader.Input.Keyboard;
 using Terraria.ModLoader.Input.Mouse;
 
@@ -7,8 +10,8 @@ namespace Terraria.ModLoader.Input
 {
 	public static class Input
 	{
-		private static int lastScreenWidth;
-		private static int lastScreenHeight;
+		private static int _lastScreenWidth;
+		private static int _lastScreenHeight;
 
 		private static KeyConfiguration KeyConfiguration {
 			get {
@@ -21,7 +24,6 @@ namespace Terraria.ModLoader.Input
 		internal static void Load() {
 			MouseInput.Load();
 			KeyboardInput.Load();
-			KeyboardInput.RepeatDelay = 31;
 
 			MouseInput.MouseMoved += args => {
 				PlayerInput.MouseX = (int)(args.X * PlayerInput.RawMouseScale.X);
@@ -37,59 +39,20 @@ namespace Terraria.ModLoader.Input
 			};
 
 			MouseInput.ButtonPressed += args => {
-				if (args.Button == MouseButton.Left) {
-					PlayerInput.MouseKeys.Add("Mouse1");
-					Main.mouseLeft = true;
-				}
-
-				if (args.Button == MouseButton.Right) {
-					PlayerInput.MouseKeys.Add("Mouse2");
-					Main.mouseRight = true;
-				}
-
-				if (args.Button == MouseButton.Middle) {
-					PlayerInput.MouseKeys.Add("Mouse3");
-					Main.mouseMiddle = true;
-				}
-
-				if (args.Button == MouseButton.XButton1) {
-					PlayerInput.MouseKeys.Add("Mouse4");
-					Main.mouseXButton1 = true;
-				}
-
-				if (args.Button == MouseButton.XButton2) {
-					PlayerInput.MouseKeys.Add("Mouse5");
-					Main.mouseXButton2 = true;
-				}
-
 				PlayerInput.CurrentInputMode = InputMode.Mouse;
 				PlayerInput.Triggers.Current.UsedMovementKey = false;
+
+				foreach (var item in KeyConfiguration.KeyStatus) {
+					if (item.Value.Contains("Mouse" + args.Button))
+						PlayerInput.Triggers.Current.KeyStatus[item.Key] = true;
+				}
 			};
 
 			MouseInput.ButtonReleased += args => {
-				if (args.Button == MouseButton.Left) {
-					PlayerInput.MouseKeys.Remove("Mouse1");
-					Main.mouseLeft = false;
-				}
-
-				if (args.Button == MouseButton.Right) {
-					PlayerInput.MouseKeys.Remove("Mouse2");
-					Main.mouseRight = false;
-				}
-
-				if (args.Button == MouseButton.Middle) {
-					PlayerInput.MouseKeys.Remove("Mouse3");
-					Main.mouseMiddle = false;
-				}
-
-				if (args.Button == MouseButton.XButton1) {
-					PlayerInput.MouseKeys.Remove("Mouse4");
-					Main.mouseXButton1 = false;
-				}
-
-				if (args.Button == MouseButton.XButton2) {
-					PlayerInput.MouseKeys.Remove("Mouse5");
-					Main.mouseXButton2 = false;
+				foreach (var pair in KeyConfiguration.KeyStatus) {
+					if (pair.Value.Contains("Mouse" + args.Button)) {
+						PlayerInput.Triggers.Current.KeyStatus[pair.Key] = false;
+					}
 				}
 			};
 
@@ -103,11 +66,23 @@ namespace Terraria.ModLoader.Input
 			};
 
 			KeyboardInput.KeyPressed += args => {
-				foreach (var pair in KeyConfiguration.KeyStatus) {
-					if (pair.Value.Contains(args.Key.ToString())) {
-						PlayerInput.Triggers.Current.KeyStatus[pair.Key] = true;
-					}
+				if (args.Key == Keys.F10 && !Main.drawingPlayerChat && !Main.editSign && !Main.editChest) {
+					SoundEngine.PlaySound(SoundID.MenuTick);
+					Main.showFrameRate = !Main.showFrameRate;
+					return;
 				}
+
+				if (args.Key == Keys.Enter && !KeyboardUtil.AltDown(args.Modifiers) && Main.hasFocus) {
+					if (!Main.drawingPlayerChat && !Main.editSign && !Main.editChest && !Main.gameMenu && !KeyboardInput.IsKeyDown(Keys.Escape)) {
+						SoundEngine.PlaySound(SoundID.MenuOpen);
+						Main.OpenPlayerChat();
+						Main.chatText = "";
+					}
+
+					return;
+				}
+
+				KeyConfiguration.Processkey(PlayerInput.Triggers.Current, args.Key.ToString());
 			};
 
 			KeyboardInput.KeyReleased += args => {
@@ -117,82 +92,19 @@ namespace Terraria.ModLoader.Input
 					}
 				}
 			};
-
-			// MouseInput.ButtonDoubleClicked += args =>
-			// {
-			// 	foreach (Layer layer in Layers)
-			// 	{
-			// 		layer.OnDoubleClick(args);
-			// 		if (args.Handled) break;
-			// 	}
-			// };
-			//
-			// MouseInput.ButtonTripleClicked += args =>
-			// {
-			// 	foreach (Layer layer in Layers)
-			// 	{
-			// 		layer.OnTripleClick(args);
-			// 		if (args.Handled) break;
-			// 	}
-			// };
-			//
-			// MouseInput.ButtonPressed += args =>
-			// {
-			// 	foreach (Layer layer in Layers)
-			// 	{
-			// 		layer.OnMouseDown(args);
-			// 		if (args.Handled) break;
-			// 	}
-			// };
-			//
-			// MouseInput.ButtonReleased += args =>
-			// {
-			// 	foreach (Layer layer in Layers)
-			// 	{
-			// 		layer.OnMouseUp(args);
-			// 		if (args.Handled) break;
-			// 	}
-			// };
-			//
-			// KeyboardEvents.KeyPressed += args =>
-			// {
-			// 	foreach (Layer layer in Layers)
-			// 	{
-			// 		layer.OnKeyPressed(args);
-			// 		if (args.Handled) break;
-			// 	}
-			// };
-			//
-			// KeyboardEvents.KeyReleased += args =>
-			// {
-			// 	foreach (Layer layer in Layers)
-			// 	{
-			// 		layer.OnKeyReleased(args);
-			// 		if (args.Handled) break;
-			// 	}
-			// };
-			//
-			// KeyboardEvents.KeyTyped += args =>
-			// {
-			// 	foreach (Layer layer in Layers)
-			// 	{
-			// 		layer.OnKeyTyped(args);
-			// 		if (args.Handled) break;
-			// 	}
-			// };
 		}
 
 		internal static void Update(GameTime time) {
 			PlayerInput.ScrollWheelDelta = 0;
 			PlayerInput.ScrollWheelDeltaForUI = 0;
 
-			if (lastScreenWidth != Main.screenWidth || lastScreenHeight != Main.screenHeight) {
+			if (_lastScreenWidth != Main.screenWidth || _lastScreenHeight != Main.screenHeight) {
 				WindowResizedEventArgs args = new WindowResizedEventArgs { Size = new Vector2(Main.screenWidth, Main.screenHeight) };
 
 				// foreach (Layer layer in Layers) layer.OnWindowResize(args);
 
-				lastScreenWidth = Main.screenWidth;
-				lastScreenHeight = Main.screenHeight;
+				_lastScreenWidth = Main.screenWidth;
+				_lastScreenHeight = Main.screenHeight;
 			}
 
 			MouseInput.Update(time);

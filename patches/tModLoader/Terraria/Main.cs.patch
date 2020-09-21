@@ -1208,22 +1208,17 @@
  		}
  
 -		private void DoUpdate_HandleInput() {
++		private void DoUpdate_HandleInput(GameTime gameTime) {
 -			PlayerInput.UpdateInput();
--			UpdateViewZoomKeys();
--			PlayerInput.SetZoom_Unscaled();
--			UILinkPointNavigator.Update();
--			PlayerInput.CacheMousePositionForZoom();
--			PlayerInput.SetZoom_MouseInWorld();
++			PlayerInput.UpdateInput(gameTime);
++			ModHooks.PostUpdateInput();
+ 			UpdateViewZoomKeys();
+ 			PlayerInput.SetZoom_Unscaled();
+ 			UILinkPointNavigator.Update();
+ 			PlayerInput.CacheMousePositionForZoom();
+ 			PlayerInput.SetZoom_MouseInWorld();
 -			oldKeyState = keyState;
 -			keyState = Keyboard.GetState();
-+		private void DoUpdate_HandleInput(GameTime gameTime) {
-+			PlayerInput.UpdateInput(gameTime);
-+			// ModHooks.PostUpdateInput();
-+			// UpdateViewZoomKeys();
-+			// PlayerInput.SetZoom_Unscaled();
-+			// UILinkPointNavigator.Update();
-+			// PlayerInput.CacheMousePositionForZoom();
-+			// PlayerInput.SetZoom_MouseInWorld();
 +			// oldKeyState = keyState;
 +			// keyState = Keyboard.GetState();
  		}

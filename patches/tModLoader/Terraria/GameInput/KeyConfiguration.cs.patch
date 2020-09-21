@@ -27,7 +27,7 @@
  		}
  
  		public void Processkey(TriggersSet set, string newKey) {
-@@ -41,22 +_,24 @@
+@@ -41,27 +_,29 @@
  		}
  
  		public void ReadPreferences(Dictionary<string, List<string>> dict) {
@@ -62,3 +62,9 @@
  			}
  
  			if (!dictionary.ContainsKey("MouseLeft") || dictionary["MouseLeft"].Count == 0) {
+ 				dictionary["MouseLeft"] = new List<string> {
+-					"Mouse1"
++					"MouseLeft"
+ 				};
+ 			}
+ 

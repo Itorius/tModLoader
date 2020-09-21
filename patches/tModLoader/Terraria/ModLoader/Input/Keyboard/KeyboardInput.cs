@@ -15,6 +15,7 @@ namespace Terraria.ModLoader.Input.Keyboard
 
 		private static TimeSpan lastPress;
 
+		private static KeyboardState current;
 		private static KeyboardState previous;
 
 		public static int InitialDelay { get; set; }
@@ -46,6 +47,10 @@ namespace Terraria.ModLoader.Input.Keyboard
 			KeyTyped?.Invoke(args);
 		}
 
+		public static bool IsKeyDown(Keys key) {
+			return current.IsKeyDown(key);
+		}
+		
 		public static event Action<KeyboardEventArgs> KeyPressed;
 
 		public static event Action<KeyboardEventArgs> KeyReleased;
@@ -55,16 +60,18 @@ namespace Terraria.ModLoader.Input.Keyboard
 		internal static void Load()
 		{
 			InitialDelay = 800;
-			RepeatDelay = 50;
+			RepeatDelay = 31;
 			keySequences = new List<KeySequence>();
 			KeyTyped += KeyTypedHandler;
+			current = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 		}
 
 		internal static void Update(GameTime gameTime)
 		{
 			if (!Main.instance.IsActive || !Main.hasFocus) return;
 
-			KeyboardState current = Microsoft.Xna.Framework.Input.Keyboard.GetState();
+			previous = current;
+			current = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
 			Modifiers modifiers = KeyboardUtil.GetModifiers(current);
 
@@ -117,10 +124,7 @@ namespace Terraria.ModLoader.Input.Keyboard
 				lastPress = gameTime.TotalGameTime;
 				isInitial = false;
 			}
-
-			previous = current;
 		}
-
 
 		private static void KeyTypedHandler(KeyboardEventArgs args)
 		{

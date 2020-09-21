@@ -397,7 +397,7 @@ namespace Terraria.ModLoader
 			MapLoader.SetupModMap();
 			ItemSorting.SetupWhiteLists();
 			RarityLoader.Initialize();
-			PlayerInput.reinitialize = true;
+			PlayerInput.Reinitialize();
 			SetupRecipes(token);
 			
 			ContentSamples.Initialize();

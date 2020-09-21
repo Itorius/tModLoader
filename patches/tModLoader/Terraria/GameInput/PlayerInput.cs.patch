@@ -67,6 +67,15 @@
  		public static int MouseX;
  		public static int MouseY;
  		public static bool LockGamepadTileUseButton = false;
+@@ -102,7 +_,7 @@
+ 		public static int PreUIX;
+ 		public static int PreUIY;
+ 		public static int PreLockOnX;
+-		public static int PreLockOnY;
++		public static int PreLockOnY; 
+ 		public static int ScrollWheelValue;
+ 		public static int ScrollWheelValueOld;
+ 		public static int ScrollWheelDelta;
 @@ -126,9 +_,9 @@
  		private static ZoomContext _currentWantedZoom;
  		private static int[] DpadSnapCooldown = new int[4];
@@ -110,14 +119,14 @@
  		}
  
 +		// To allow mod hotkeys to load, need to reinitialize after load.
-+		internal static bool reinitialize;
++		// internal static bool reinitialize;
 +
-+		private static void ReInitialize() {
++		internal static void Reinitialize() {
 +			Profiles.Clear();
 +			OriginalProfiles.Clear();
 +			Initialize_Inner(); //Mirsario: To not repeat code in patches, reuse the one that was previously in Initialize().
 +			Load(); // Loads the JSON into the Profiles above
-+			reinitialize = false;
++			// reinitialize = false;
 +		}
 +
  		public static void Initialize() {
@@ -142,7 +151,7 @@
  			Dictionary<string, PlayerInputProfile> dictionary = new Dictionary<string, PlayerInputProfile>();
  			string currentValue = null;
  			Main.InputProfiles.Get("Selected Profile", ref currentValue);
-@@ -397,145 +_,65 @@
+@@ -397,145 +_,63 @@
  
  		public static void ManageVersion_1_3() {
  			PlayerInputProfile playerInputProfile = Profiles["Custom"];
@@ -252,8 +261,8 @@
 -			ScrollWheelValueOld = ScrollWheelValue;
 -			ScrollWheelValue = 0;
 +		public static void UpdateInput(GameTime gameTime) {
-+			if (reinitialize)
-+				ReInitialize();
++			// if (reinitialize)
++				// ReInitialize();
 +
 +			// Triggers.Reset();
 +			// ScrollWheelValueOld = ScrollWheelValue;
@@ -288,30 +297,28 @@
 -			MouseInput();
 -			int num = 0 | (KeyboardInput() ? 1 : 0) | (GamePadInput() ? 1 : 0);
 -			Triggers.Update();
-+			// MouseInput();
+-			PostInput();
+-			ScrollWheelDelta = ScrollWheelValue - ScrollWheelValueOld;
+-			ScrollWheelDeltaForUI = ScrollWheelDelta;
+-			WritingText = false;
+-			UpdateMainMouse();
 +
 +			Input.Update(gameTime);
 +
-+			KeyConfiguration keyConfiguration = CurrentProfile.InputModes[InputMode.Keyboard];
-+			for (int l = 0; l < MouseKeys.Count; l++) keyConfiguration.Processkey(Triggers.Current, MouseKeys[l]);
-+
+ 			Main.mouseLeft = Triggers.Current.MouseLeft;
+ 			Main.mouseRight = Triggers.Current.MouseRight;
++			Main.mouseMiddle = Triggers.Current.MouseMiddle;
++			Main.mouseXButton1 = Triggers.Current.MouseXButton1;
++			Main.mouseXButton2 = Triggers.Current.MouseXButton2;
++			
 +			// int num = 0 /*| (KeyboardInput() ? 1 : 0)*/ | (GamePadInput() ? 1 : 0);
 +			// Triggers.Update();
- 			PostInput();
--			ScrollWheelDelta = ScrollWheelValue - ScrollWheelValueOld;
--			ScrollWheelDeltaForUI = ScrollWheelDelta;
++			PostInput();
 +			// ScrollWheelDelta = ScrollWheelValue - ScrollWheelValueOld;
 +			// ScrollWheelDeltaForUI = ScrollWheelDelta;
- 			WritingText = false;
--			UpdateMainMouse();
--			Main.mouseLeft = Triggers.Current.MouseLeft;
--			Main.mouseRight = Triggers.Current.MouseRight;
++			WritingText = false;
 +			// UpdateMainMouse();
-+			// Main.mouseLeft = Triggers.Current.MouseLeft;
-+			// Main.mouseRight = Triggers.Current.MouseRight;
-+			// Main.mouseMiddle = Triggers.Current.MouseMiddle;
-+			// Main.mouseXButton1 = Triggers.Current.MouseXButton1;
-+			// Main.mouseXButton2 = Triggers.Current.MouseXButton2;
++			
  			CacheZoomableValues();
 -			if (num != 0 && PlayerInput.OnActionableInput != null)
 -				PlayerInput.OnActionableInput();
@@ -338,7 +345,7 @@
  		}
  
  		private static void CacheOriginalInput() {
-@@ -561,439 +_,325 @@
+@@ -561,453 +_,317 @@
  			_originalScreenHeight = Main.screenHeight;
  		}
  
@@ -770,6 +777,25 @@
 -
 -		private static void DebugKeys(List<Keys> keys) {
 -		}
+-
+-		private static void FixDerpedRebinds() {
+-			List<string> list = new List<string> {
+-				"MouseLeft",
+-				"MouseRight",
+-				"Inventory"
+-			};
+-
+-			foreach (InputMode value in Enum.GetValues(typeof(InputMode))) {
+-				if (value == InputMode.Mouse)
+-					continue;
+-
+-				FixKeysConflict(value, list);
+-				foreach (string item in list) {
+-					if (CurrentProfile.InputModes[value].KeyStatus[item].Count < 1)
+-						ResetKeyBinding(value, item);
+-				}
+-			}
+-		}
 +		// private static bool GamePadInput() {
 +		// 	bool flag = false;
 +		// 	ScrollWheelValue += GamepadScrollValue;
@@ -1082,16 +1108,8 @@
 +		// 	return flag;
 +		// }
  
- 		private static void FixDerpedRebinds() {
- 			List<string> list = new List<string> {
- 				"MouseLeft",
- 				"MouseRight",
-+				"MouseMiddle",
-+				"MouseXButton1",
-+				"MouseXButton2",
- 				"Inventory"
- 			};
- 
+ 		private static void FixKeysConflict(InputMode inputMode, List<string> triggers) {
+ 			for (int i = 0; i < triggers.Count; i++) {
 @@ -1031,96 +_,96 @@
  			CurrentProfile.InputModes[inputMode].KeyStatus[trigger].AddRange(OriginalProfiles[key].InputModes[inputMode].KeyStatus[trigger]);
  		}
@@ -1277,16 +1295,45 @@
  			if (CurrentProfile.HotbarAllowsRadial) {
  				int num = Triggers.Current.HotbarPlus.ToInt() - Triggers.Current.HotbarMinus.ToInt();
  				if (MiscSettingsTEMP.HotbarRadialShouldBeUsed) {
-@@ -1175,7 +_,7 @@
+@@ -1148,7 +_,7 @@
+ 				Vector2 vector = Vector2.Zero;
+ 				if (Main.gameMenu || (UILinkPointNavigator.Available && !InBuildingMode))
+ 					return;
+-
++		
+ 				switch (i) {
+ 					case 0:
+ 						flag = Triggers.Current.DpadMouseSnap1;
+@@ -1167,16 +_,16 @@
+ 						vector = -Vector2.UnitX;
+ 						break;
+ 				}
+-
++		
+ 				if (DpadSnapCooldown[i] > 0)
+ 					DpadSnapCooldown[i]--;
+-
++		
+ 				if (flag) {
  					if (DpadSnapCooldown[i] == 0) {
  						int num = 6;
  						if (ItemSlot.IsABuildingItem(player.inventory[player.selectedItem]))
 -							num = player.inventory[player.selectedItem].useTime;
+-
 +							num = PlayerHooks.TotalUseTime(player.inventory[player.selectedItem].useTime, player, player.inventory[player.selectedItem]);
- 
++		
  						DpadSnapCooldown[i] = num;
  						zero += vector;
-@@ -1192,7 +_,7 @@
+ 					}
+@@ -1185,31 +_,31 @@
+ 					DpadSnapCooldown[i] = 0;
+ 				}
+ 			}
+-
++		
+ 			if (zero != Vector2.Zero) {
+ 				Main.SmartCursorEnabled = false;
+ 				Matrix zoomMatrix = Main.GameViewMatrix.ZoomMatrix;
  				Matrix matrix = Matrix.Invert(zoomMatrix);
  				Vector2 mouseScreen = Main.MouseScreen;
  				Vector2.Transform(Main.screenPosition, matrix);
@@ -1295,7 +1342,36 @@
  				MouseX = (int)vector2.X;
  				MouseY = (int)vector2.Y;
  			}
-@@ -1234,7 +_,7 @@
+ 		}
+-
++		
+ 		public static string ComposeInstructionsForGamepad() {
+ 			string text = "";
+ 			if (!UsingGamepad)
+ 				return text;
+-
++		
+ 			InputMode inputMode = InputMode.XBoxGamepad;
+ 			if (Main.gameMenu || UILinkPointNavigator.Available)
+ 				inputMode = InputMode.XBoxGamepadUI;
+-
++		
+ 			if (InBuildingMode && !Main.gameMenu)
+ 				inputMode = InputMode.XBoxGamepad;
+-
++		
+ 			KeyConfiguration keyConfiguration = CurrentProfile.InputModes[inputMode];
+ 			if (Main.mapFullscreen && !Main.gameMenu) {
+ 				text += "          ";
+@@ -1227,14 +_,14 @@
+ 				text += BuildCommand(Lang.misc[59].Value, false, keyConfiguration.KeyStatus["HotbarMinus"], keyConfiguration.KeyStatus["HotbarPlus"]);
+ 				if (InBuildingMode)
+ 					text += BuildCommand(Lang.menu[6].Value, false, keyConfiguration.KeyStatus["Inventory"], keyConfiguration.KeyStatus["MouseRight"]);
+-
++		
+ 				if (WiresUI.Open) {
+ 					text += BuildCommand(Lang.misc[53].Value, false, keyConfiguration.KeyStatus["MouseLeft"]);
+ 					text += BuildCommand(Lang.misc[56].Value, false, keyConfiguration.KeyStatus["MouseRight"]);
  				}
  				else {
  					Item item = Main.player[Main.myPlayer].inventory[Main.player[Main.myPlayer].selectedItem];
@@ -1304,15 +1380,45 @@
  					bool flag = true;
  					bool flag2 = Main.SmartInteractProj != -1 || Main.HasInteractibleObjectThatIsNotATile;
  					bool flag3 = !Main.SmartInteractShowingGenuine && Main.SmartInteractShowingFake;
-@@ -1256,7 +_,7 @@
+@@ -1242,32 +_,32 @@
+ 						if (Main.SmartInteractNPC != -1) {
+ 							if (flag3)
  								flag = false;
- 
+-
++		
+ 							text += BuildCommand(Lang.misc[80].Value, false, keyConfiguration.KeyStatus["MouseRight"]);
+ 						}
+ 						else if (flag2) {
+ 							if (flag3)
+ 								flag = false;
+-
++		
+ 							text += BuildCommand(Lang.misc[79].Value, false, keyConfiguration.KeyStatus["MouseRight"]);
+ 						}
+ 						else if (Main.SmartInteractX != -1 && Main.SmartInteractY != -1) {
+ 							if (flag3)
+ 								flag = false;
+-
++		
  							Tile tile = Main.tile[Main.SmartInteractX, Main.SmartInteractY];
 -							text = ((!TileID.Sets.TileInteractRead[tile.type]) ? (text + BuildCommand(Lang.misc[79].Value, false, keyConfiguration.KeyStatus["MouseRight"])) : (text + BuildCommand(Lang.misc[81].Value, false, keyConfiguration.KeyStatus["MouseRight"])));
 +							text = !TileID.Sets.TileInteractRead[tile.type] ? text + BuildCommand(Lang.misc[79].Value, false, keyConfiguration.KeyStatus["MouseRight"]) : text + BuildCommand(Lang.misc[81].Value, false, keyConfiguration.KeyStatus["MouseRight"]);
  						}
  					}
  					else if (WiresUI.Settings.DrawToolModeUI) {
+ 						text += BuildCommand(Lang.misc[89].Value, false, keyConfiguration.KeyStatus["MouseRight"]);
+ 					}
+-
++		
+ 					if ((!GrappleAndInteractAreShared || (!WiresUI.Settings.DrawToolModeUI && (!Main.SmartInteractShowingGenuine || !Main.HasSmartInteractTarget) && (!Main.SmartInteractShowingFake || flag))) && Main.LocalPlayer.QuickGrapple_GetItemToUse() != null)
+ 						text += BuildCommand(Lang.misc[57].Value, false, keyConfiguration.KeyStatus["Grapple"]);
+ 				}
+ 			}
+-
++		
+ 			return text;
+ 		}
+ 
 @@ -1299,15 +_,11 @@
  
  			if (!(triggerName == "SmartSelect")) {
@@ -1342,27 +1448,51 @@
  
  			foreach (string text2 in array) {
  				if (text2.Contains(": {")) {
-@@ -1417,6 +_,9 @@
+@@ -1400,14 +_,6 @@
+ 			text = text.Replace("\r\n    ]", "]");
+ 		}
+ 
+-		public static void PrettyPrintProfilesOld(ref string text) {
+-			text = text.Replace(": {\r\n  ", ": \r\n  {\r\n  ");
+-			text = text.Replace("[\r\n      ", "[");
+-			text = text.Replace("\"\r\n      ", "\"");
+-			text = text.Replace("\",\r\n      ", "\", ");
+-			text = text.Replace("\r\n    ]", "]");
+-		}
+-
+ 		public static void Reset(KeyConfiguration c, PresetProfiles style, InputMode mode) {
+ 			switch (style) {
+ 				case PresetProfiles.Redigit:
+@@ -1415,8 +_,11 @@
+ 						case InputMode.Mouse:
+ 							break;
  						case InputMode.Keyboard:
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1454,6 +_,9 @@
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
+@@ -1451,9 +_,12 @@
+ 							c.KeyStatus["ToggleCreativeMenu"].Add("C");
+ 							break;
+ 						case InputMode.KeyboardUI:
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
  							c.KeyStatus["MouseLeft"].Add("Space");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
-@@ -1517,6 +_,7 @@
+@@ -1517,14 +_,18 @@
  							c.KeyStatus["MenuRight"].Add(string.Concat(Buttons.DPadRight));
  							break;
  					}
@@ -1370,27 +1500,35 @@
  					break;
  				case PresetProfiles.Yoraiz0r:
  					switch (mode) {
-@@ -1525,6 +_,9 @@
+ 						case InputMode.Mouse:
+ 							break;
  						case InputMode.Keyboard:
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1562,6 +_,9 @@
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
+@@ -1559,9 +_,12 @@
+ 							c.KeyStatus["ToggleCreativeMenu"].Add("C");
+ 							break;
+ 						case InputMode.KeyboardUI:
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
  							c.KeyStatus["MouseLeft"].Add("Space");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
-@@ -1624,6 +_,7 @@
+@@ -1624,14 +_,18 @@
  							c.KeyStatus["MenuRight"].Add(string.Concat(Buttons.DPadRight));
  							break;
  					}
@@ -1398,27 +1536,35 @@
  					break;
  				case PresetProfiles.ConsolePS:
  					switch (mode) {
-@@ -1632,6 +_,9 @@
+ 						case InputMode.Mouse:
+ 							break;
  						case InputMode.Keyboard:
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1669,6 +_,9 @@
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
+@@ -1666,9 +_,12 @@
+ 							c.KeyStatus["ToggleCreativeMenu"].Add("C");
+ 							break;
+ 						case InputMode.KeyboardUI:
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
  							c.KeyStatus["MouseLeft"].Add("Space");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
-@@ -1731,6 +_,7 @@
+@@ -1731,14 +_,18 @@
  							c.KeyStatus["MenuRight"].Add(string.Concat(Buttons.DPadRight));
  							break;
  					}
@@ -1426,23 +1572,31 @@
  					break;
  				case PresetProfiles.ConsoleXBox:
  					switch (mode) {
-@@ -1739,6 +_,9 @@
+ 						case InputMode.Mouse:
+ 							break;
  						case InputMode.Keyboard:
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1776,6 +_,9 @@
- 							c.KeyStatus["MouseLeft"].Add("Mouse1");
+@@ -1773,9 +_,12 @@
+ 							c.KeyStatus["ToggleCreativeMenu"].Add("C");
+ 							break;
+ 						case InputMode.KeyboardUI:
+-							c.KeyStatus["MouseLeft"].Add("Mouse1");
++							c.KeyStatus["MouseLeft"].Add("MouseLeft");
  							c.KeyStatus["MouseLeft"].Add("Space");
- 							c.KeyStatus["MouseRight"].Add("Mouse2");
-+							c.KeyStatus["MouseMiddle"].Add("Mouse3");
-+							c.KeyStatus["MouseXButton1"].Add("Mouse4");
-+							c.KeyStatus["MouseXButton2"].Add("Mouse5");
+-							c.KeyStatus["MouseRight"].Add("Mouse2");
++							c.KeyStatus["MouseRight"].Add("MouseRight");
++							c.KeyStatus["MouseMiddle"].Add("MouseMiddle");
++							c.KeyStatus["MouseXButton1"].Add("MouseXButton1");
++							c.KeyStatus["MouseXButton2"].Add("MouseXButton2");
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
