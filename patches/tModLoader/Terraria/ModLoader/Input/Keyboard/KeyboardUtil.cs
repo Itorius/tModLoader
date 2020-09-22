@@ -4,6 +4,7 @@ namespace Terraria.ModLoader.Input.Keyboard
 {
 	public static class KeyboardUtil
 	{
+		// todo: proper IME (once on FNA)
 		public static char? ToChar(Keys key, Modifiers modifiers = Modifiers.None)
 		{
 			switch (key)

@@ -43,11 +43,7 @@ namespace Terraria.ModLoader.Input
 			MouseInput.MouseScroll += args => {
 				foreach (Layer layer in Layers) {
 					layer.OnMouseScroll(args);
-					if (args.Handled) {
-						// PlayerInput.ScrollWheelDelta = 0;
-						// PlayerInput.ScrollWheelDeltaForUI = 0;
-						break;
-					}
+					if (args.Handled) break;
 				}
 			};
 
@@ -61,6 +57,13 @@ namespace Terraria.ModLoader.Input
 			KeyboardInput.KeyReleased += args => {
 				foreach (Layer layer in Layers) {
 					layer.OnKeyReleased(args);
+					if (args.Handled) break;
+				}
+			};
+			
+			KeyboardInput.KeyTyped += args => {
+				foreach (Layer layer in Layers) {
+					layer.OnKeyTyped(args);
 					if (args.Handled) break;
 				}
 			};
