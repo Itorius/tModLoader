@@ -43,7 +43,11 @@ namespace Terraria.ModLoader.Input
 			MouseInput.MouseScroll += args => {
 				foreach (Layer layer in Layers) {
 					layer.OnMouseScroll(args);
-					if (args.Handled) break;
+					if (args.Handled) {
+						// PlayerInput.ScrollWheelDelta = 0;
+						// PlayerInput.ScrollWheelDeltaForUI = 0;
+						break;
+					}
 				}
 			};
 

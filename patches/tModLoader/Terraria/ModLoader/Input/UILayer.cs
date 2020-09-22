@@ -66,8 +66,7 @@ namespace Terraria.ModLoader.Input
 		private Vector2 offset;
 		private bool dragging;
 
-		protected override void MouseDown(MouseButtonEventArgs args)
-		{
+		protected override void MouseDown(MouseButtonEventArgs args) {
 			if (args.Button != MouseButton.Left) return;
 
 			offset = args.Position - Position;
@@ -77,8 +76,7 @@ namespace Terraria.ModLoader.Input
 			args.Handled = true;
 		}
 
-		protected override void MouseUp(MouseButtonEventArgs args)
-		{
+		protected override void MouseUp(MouseButtonEventArgs args) {
 			if (args.Button != MouseButton.Left) return;
 
 			dragging = false;
@@ -86,10 +84,8 @@ namespace Terraria.ModLoader.Input
 			args.Handled = true;
 		}
 
-		protected override void Update(GameTime gameTime)
-		{
-			if (IsMouseHovering)
-			{
+		protected override void Update(GameTime gameTime) {
+			if (IsMouseHovering) {
 				Main.LocalPlayer.mouseInterface = true;
 				Main.LocalPlayer.cursorItemIconEnabled = false;
 				Main.ItemIconCacheUpdate(0);
@@ -97,21 +93,20 @@ namespace Terraria.ModLoader.Input
 				Main.HoverItem = new Item();
 			}
 
-			if (dragging)
-			{
+			if (dragging) {
 				X.Percent = 0;
 				Y.Percent = 0;
 
 				Rectangle parent = Parent?.InnerDimensions ?? UserInterface.ActiveInstance.GetDimensions().ToRectangle();
 
-				X.Pixels = Utils.Clamp((int)(Main.mouseX - offset.X - parent.X),0, parent.Width - OuterDimensions.Width);
-				Y.Pixels = Utils.Clamp((int)(Main.mouseY - offset.Y - parent.Y),0, parent.Height - OuterDimensions.Height);
+				X.Pixels = Utils.Clamp((int)(Main.mouseX - offset.X - parent.X), 0, parent.Width - OuterDimensions.Width);
+				Y.Pixels = Utils.Clamp((int)(Main.mouseY - offset.Y - parent.Y), 0, parent.Height - OuterDimensions.Height);
 
 				Recalculate();
 			}
 		}
 	}
-	
+
 	public class Doot : BaseState
 	{
 		public override bool Enabled => true;
@@ -122,15 +117,36 @@ namespace Terraria.ModLoader.Input
 
 			UIDraggablePanel panel = new UIDraggablePanel { Width = new StyleDimension(0, 20), Height = new StyleDimension(0, 20), X = new StyleDimension(0, 50), Y = new StyleDimension(0, 50) };
 			Add(panel);
-			
-			UIPanel childPanel = new UIPanel { Width = new StyleDimension(0, 80), Height = new StyleDimension(60, 0), X = new StyleDimension(0, 30), Y = new StyleDimension(0, 100) };
+
+			UIPanel childPanel = new UIPanel {
+				Width = new StyleDimension(0, 80),
+				Height = new StyleDimension(60, 0),
+				X = new StyleDimension(0, 30),
+				Y = new StyleDimension(0, 100),
+				BackgroundColor = Color.Black
+			};
+
+			int color = 0;
+			childPanel.OnMouseScroll += args => {
+				if (args.OffsetY > 0) {
+					if (color <= 250) color += 5;
+				}
+				else {
+					if (color >= 5)
+						color -= 5;
+				}
+
+				childPanel.BackgroundColor = new Color(color, color, color);
+
+				args.Handled = true;
+			};
 			panel.Add(childPanel);
 		}
 	}
 
 	public class UILayer : Layer
 	{
-		public override bool Enabled => !Main.gameMenu;
+		public override bool Enabled => !Main.gameMenu && !Main.ingameOptionsWindow;
 
 		private static float Scale => Main.gameMenu ? 1f : Main.UIScale;
 
@@ -173,7 +189,8 @@ namespace Terraria.ModLoader.Input
 		}
 
 		public override void OnMouseDown(MouseButtonEventArgs args) {
-			args.Position *= 1f / Scale;
+			float scale = 1f / Scale;
+			args.Position = new Vector2((int)(args.Position.X * scale), (int)(args.Position.Y * scale));
 
 			var elements = Elements.Where(element => element.Display != Display.None && element.ContainsPoint(args.Position)).ToList();
 			foreach (BaseState element in elements) {
@@ -185,7 +202,8 @@ namespace Terraria.ModLoader.Input
 		}
 
 		public override void OnMouseUp(MouseButtonEventArgs args) {
-			args.Position *= 1f / Scale;
+			float scale = 1f / Scale;
+			args.Position = new Vector2((int)(args.Position.X * scale), (int)(args.Position.Y * scale));
 
 			if (mouseDownElement != null) {
 				mouseDownElement.InternalMouseUp(args);
