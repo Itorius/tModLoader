@@ -10,11 +10,12 @@ namespace Terraria.ModLoader.Input
 		private static int _lastScreenWidth;
 		private static int _lastScreenHeight;
 
-		private static LayerStack Layers;
+		internal static LayerStack Layers;
 
 		internal static void Load() {
 			Layers = new LayerStack();
 			Layers.PushLayer(new TerrariaLayer());
+			Layers.PushOverlay(new UILayer());
 
 			MouseInput.Load();
 			KeyboardInput.Load();

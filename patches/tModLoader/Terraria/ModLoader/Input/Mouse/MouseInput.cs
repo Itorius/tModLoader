@@ -29,9 +29,9 @@ namespace Terraria.ModLoader.Input.Mouse
 
 		private static MouseState previous;
 
-		private static MouseState Mouse;
+		internal static MouseState Mouse;
 
-		private static KeyboardState Keyboard;
+		internal static KeyboardState Keyboard;
 
 		private static Dictionary<MouseButton, LastClick> lastClicks;
 

@@ -8,7 +8,7 @@
  using Terraria.Achievements;
  using Terraria.Audio;
  using Terraria.Chat;
-@@ -66,6 +_,13 @@
+@@ -66,6 +_,14 @@
  using Terraria.IO;
  using Terraria.Localization;
  using Terraria.Map;
@@ -17,6 +17,7 @@
 +using Terraria.ModLoader.Core;
 +using Terraria.ModLoader.Default;
 +using Terraria.ModLoader.Engine;
++using Terraria.ModLoader.Input;
 +using Terraria.ModLoader.IO;
 +using Terraria.ModLoader.UI;
  using Terraria.Net;
@@ -1111,10 +1112,14 @@
  			if (!dedServ && (double)screenPosition.Y < worldSurface * 16.0 + 16.0 && netMode != 2) {
  				Star.UpdateStars();
  				Cloud.UpdateClouds();
-@@ -12828,6 +_,8 @@
+@@ -12828,6 +_,12 @@
  			if (InGameUI != null)
  				InGameUI.Update(gameTime);
  
++			foreach (Layer layer in Input.Layers) {
++				layer.OnUpdate(gameTime);
++			}
++
 +			ModHooks.UpdateUI(gameTime);
 +			PlayerInput.ScrollWheelDeltaForUI = 0; //TODO: Should this be before PlayerInput.ResetInputsOnActiveStateChange()?
  			CreativeMenu.Update(gameTime);
@@ -2524,12 +2529,27 @@
  			}
  		}
  
-@@ -33015,7 +_,9 @@
+@@ -33015,7 +_,24 @@
  				SetupDrawInterfaceLayers();
  
  			PlayerInput.SetZoom_UI();
 +			List<GameInterfaceLayer> interfaceLayers = new List<GameInterfaceLayer>(_gameInterfaceLayers);
 +			ModHooks.ModifyInterfaceLayers(interfaceLayers);
++
++			int MouseTextIndex = interfaceLayers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
++
++			if (MouseTextIndex != -1)
++			{
++				interfaceLayers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("Layers", delegate
++				{
++                    foreach (Layer layer in Input.Layers) {
++						if (layer.Enabled) layer.OnDraw(spriteBatch, gameTime);
++                    }
++
++					return true;
++				}, InterfaceScaleType.UI));
++			}
++			
 -			using (List<GameInterfaceLayer>.Enumerator enumerator = _gameInterfaceLayers.GetEnumerator()) {
 +			using (List<GameInterfaceLayer>.Enumerator enumerator = interfaceLayers.GetEnumerator()) {
  				while (enumerator.MoveNext() && enumerator.Current.Draw()) {

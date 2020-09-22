@@ -11,7 +11,7 @@ namespace Terraria.ModLoader.Input
 		{
 		}
 
-		public virtual void OnDraw(SpriteBatch spriteBatch)
+		public virtual void OnDraw(SpriteBatch spriteBatch, GameTime gameTime)
 		{
 		}
 

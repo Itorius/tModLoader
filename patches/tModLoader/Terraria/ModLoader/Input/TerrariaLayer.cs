@@ -14,7 +14,7 @@ namespace Terraria.ModLoader.Input
 				return PlayerInput.CurrentProfile.InputModes[InputMode.Keyboard];
 			}
 		}
-		
+
 		public override void OnMouseMove(MouseMoveEventArgs args) {
 			PlayerInput.MouseX = (int)(args.X * PlayerInput.RawMouseScale.X);
 			PlayerInput.MouseY = (int)(args.Y * PlayerInput.RawMouseScale.Y);
