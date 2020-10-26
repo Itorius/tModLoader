@@ -1094,7 +1094,7 @@
  					if (gameMenu)
  						UpdateMenu();
  
-@@ -12635,7 +_,7 @@
+@@ -12720,7 +_,7 @@
  				DoUpdate_F7_ToggleGraphicsDiagnostics();
  				DoUpdate_F11_ToggleUI();
  				DoUpdate_AltEnter_ToggleFullscreen();
@@ -1103,7 +1103,7 @@
  				DoUpdate_HandleChat();
  				DoUpdate_Enter_ToggleChat();
  				if (gameMenu) {
-@@ -12705,6 +_,7 @@
+@@ -12790,6 +_,7 @@
  				Sandstorm.EmitDust();
  			}
  
@@ -1111,7 +1111,7 @@
  			if (!dedServ && (double)screenPosition.Y < worldSurface * 16.0 + 16.0 && netMode != 2) {
  				Star.UpdateStars();
  				Cloud.UpdateClouds();
-@@ -12828,6 +_,12 @@
+@@ -12935,6 +_,12 @@
  			if (InGameUI != null)
  				InGameUI.Update(gameTime);
  
@@ -1120,7 +1120,7 @@
 +			}
 +
 +			ModHooks.UpdateUI(gameTime);
-+			PlayerInput.ScrollWheelDeltaForUI = 0; //TODO: Should this be before PlayerInput.ResetInputsOnActiveStateChange()?
++			PlayerInput.ScrollWheelDeltaForUI = 0;
  			CreativeMenu.Update(gameTime);
  			BigBossProgressBar.Update();
  		}
@@ -1207,7 +1207,7 @@
  				ChatMessage message = ChatManager.Commands.CreateOutgoingMessage(chatText);
  				if (netMode == 1)
  					ChatHelper.SendChatMessageFromClient(message);
-@@ -13408,15 +_,16 @@
+@@ -13518,15 +_,16 @@
  			SoundEngine.PlaySound(11);
  		}
  
@@ -1228,7 +1228,7 @@
  		}
  
  		private static void DoUpdate_AltEnter_ToggleFullscreen() {
-@@ -14058,6 +_,7 @@
+@@ -14168,6 +_,7 @@
  			if (tileFrameCounter[493] < 0)
  				tileFrameCounter[493] += 120;
  
@@ -2584,22 +2584,20 @@
  			}
  		}
  
-@@ -33015,7 +_,24 @@
+@@ -33286,7 +_,22 @@
  				SetupDrawInterfaceLayers();
  
  			PlayerInput.SetZoom_UI();
 +			List<GameInterfaceLayer> interfaceLayers = new List<GameInterfaceLayer>(_gameInterfaceLayers);
 +			ModHooks.ModifyInterfaceLayers(interfaceLayers);
 +
-+			int MouseTextIndex = interfaceLayers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
++			int mouseTextIndex = interfaceLayers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
 +
-+			if (MouseTextIndex != -1)
-+			{
-+				interfaceLayers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("Layers", delegate
-+				{
-+                    foreach (Layer layer in Input.Layers) {
-+						if (layer.Enabled) layer.OnDraw(spriteBatch, gameTime);
-+                    }
++			if (mouseTextIndex != -1) {
++				interfaceLayers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer("Layers", delegate {
++					foreach (Layer layer in Input.Layers) {
++						if (layer.Enabled) layer.OnDraw(Main.spriteBatch, gameTime);
++					}
 +
 +					return true;
 +				}, InterfaceScaleType.UI));
@@ -3145,15 +3143,16 @@
  		}
  
  		private void DoDraw(GameTime gameTime) {
-@@ -46681,7 +_,6 @@
+@@ -46997,7 +_,7 @@
  			_drawCycleCounter = (_drawCycleCounter + 1) % 5uL;
  			MenuUI.IsVisible = (gameMenu && menuMode == 888);
  			InGameUI.IsVisible = (!gameMenu && InGameUI.CurrentState != null);
 -			PlayerInput.UpdateMainMouse();
++			// PlayerInput.UpdateMainMouse();
  			RefreshPlayerDrawOrder();
  			CaptureManager.Instance.DrawTick();
  			TimeLogger.NewDrawFrame();
-@@ -46963,8 +_,8 @@
+@@ -47283,8 +_,8 @@
  			UpdateAtmosphereTransparencyToSkyColor();
  			base.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
  			base.Draw(gameTime);
