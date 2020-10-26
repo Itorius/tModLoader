@@ -345,7 +345,7 @@
  		}
  
  		private static void CacheOriginalInput() {
-@@ -561,453 +_,317 @@
+@@ -561,433 +_,433 @@
  			_originalScreenHeight = Main.screenHeight;
  		}
  
@@ -709,8 +709,10 @@
 -			bool flag2 = false;
 -			List<Keys> pressedKeys = GetPressedKeys();
 -			DebugKeys(pressedKeys);
--			if (pressedKeys.Count == 0 && MouseKeys.Count == 0)
+-			if (pressedKeys.Count == 0 && MouseKeys.Count == 0) {
+-				Main.blockKey = Keys.None.ToString();
 -				return false;
+-			}
 -
 -			for (int i = 0; i < pressedKeys.Count; i++) {
 -				if (pressedKeys[i] == Keys.LeftShift || pressedKeys[i] == Keys.RightShift)
@@ -774,28 +776,6 @@
 -
 -			return flag4;
 -		}
--
--		private static void DebugKeys(List<Keys> keys) {
--		}
--
--		private static void FixDerpedRebinds() {
--			List<string> list = new List<string> {
--				"MouseLeft",
--				"MouseRight",
--				"Inventory"
--			};
--
--			foreach (InputMode value in Enum.GetValues(typeof(InputMode))) {
--				if (value == InputMode.Mouse)
--					continue;
--
--				FixKeysConflict(value, list);
--				foreach (string item in list) {
--					if (CurrentProfile.InputModes[value].KeyStatus[item].Count < 1)
--						ResetKeyBinding(value, item);
--				}
--			}
--		}
 +		// private static bool GamePadInput() {
 +		// 	bool flag = false;
 +		// 	ScrollWheelValue += GamepadScrollValue;
@@ -841,8 +821,8 @@
 +		// 	int num = 2145386496;
 +		// 	for (int j = 0; j < ButtonsGamepad.Length; j++) {
 +		// 		if ((num & (int)ButtonsGamepad[j]) <= 0 && gamePadState.IsButtonDown(ButtonsGamepad[j])) {
-+		// 			// if (CheckRebindingProcessGamepad(ButtonsGamepad[j].ToString()))
-+		// 				// return false;
++		// 			if (CheckRebindingProcessGamepad(ButtonsGamepad[j].ToString()))
++		// 				return false;
 +		//
 +		// 			keyConfiguration.Processkey(Triggers.Current, ButtonsGamepad[j].ToString());
 +		// 			flag = true;
@@ -872,87 +852,85 @@
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(-Vector2.UnitX, vector2) >= num2 && gamepadThumbstickLeft.X < 0f - CurrentProfile.LeftThumbstickDeadzoneX) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickLeft.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickLeft.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.LeftThumbstickLeft.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(Vector2.UnitX, vector2) >= num2 && gamepadThumbstickLeft.X > CurrentProfile.LeftThumbstickDeadzoneX) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickRight.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickRight.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.LeftThumbstickRight.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(-Vector2.UnitY, vector2) >= num2 && gamepadThumbstickLeft.Y < 0f - CurrentProfile.LeftThumbstickDeadzoneY) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickUp.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickUp.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.LeftThumbstickUp.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(Vector2.UnitY, vector2) >= num2 && gamepadThumbstickLeft.Y > CurrentProfile.LeftThumbstickDeadzoneY) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickDown.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.LeftThumbstickDown.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.LeftThumbstickDown.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(-Vector2.UnitX, vector) >= num2 && gamepadThumbstickRight.X < 0f - CurrentProfile.RightThumbstickDeadzoneX) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.RightThumbstickLeft.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.RightThumbstickLeft.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.RightThumbstickLeft.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(Vector2.UnitX, vector) >= num2 && gamepadThumbstickRight.X > CurrentProfile.RightThumbstickDeadzoneX) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.RightThumbstickRight.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.RightThumbstickRight.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.RightThumbstickRight.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(-Vector2.UnitY, vector) >= num2 && gamepadThumbstickRight.Y < 0f - CurrentProfile.RightThumbstickDeadzoneY) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.RightThumbstickUp.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.RightThumbstickUp.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.RightThumbstickUp.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (Vector2.Dot(Vector2.UnitY, vector) >= num2 && gamepadThumbstickRight.Y > CurrentProfile.RightThumbstickDeadzoneY) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.RightThumbstickDown.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.RightThumbstickDown.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.RightThumbstickDown.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (gamePadState.Triggers.Left > triggersDeadzone) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.LeftTrigger.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.LeftTrigger.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.LeftTrigger.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
 +		// 	if (gamePadState.Triggers.Right > triggersDeadzone) {
-+		// 		// if (CheckRebindingProcessGamepad(Buttons.RightTrigger.ToString()))
-+		// 			// return false;
++		// 		if (CheckRebindingProcessGamepad(Buttons.RightTrigger.ToString()))
++		// 			return false;
 +		//
 +		// 		keyConfiguration.Processkey(Triggers.Current, Buttons.RightTrigger.ToString());
 +		// 		flag = true;
 +		// 	}
 +		//
-+		// 	// TODO: We might just need a bool for while reloading.
-+		// 	if (player.HeldItem.type >= ItemID.Sets.GamepadWholeScreenUseRange.Length) return false;
 +		// 	bool flag4 = ItemID.Sets.GamepadWholeScreenUseRange[player.inventory[player.selectedItem].type] || player.scope;
 +		// 	int num3 = player.inventory[player.selectedItem].tileBoost + ItemID.Sets.GamepadExtraRange[player.inventory[player.selectedItem].type];
 +		// 	if (player.yoyoString && ItemID.Sets.Yoyo[player.inventory[player.selectedItem].type])
@@ -1107,10 +1085,128 @@
 +		//
 +		// 	return flag;
 +		// }
++
++		// private static void MouseInput() {
++		// 	bool flag = false;
++		// 	MouseInfoOld = MouseInfo;
++		// 	MouseInfo = Mouse.GetState();
++		// 	ScrollWheelValue += MouseInfo.ScrollWheelValue;
++		// 	if (MouseInfo.X != MouseInfoOld.X || MouseInfo.Y != MouseInfoOld.Y || MouseInfo.ScrollWheelValue != MouseInfoOld.ScrollWheelValue) {
++		// 		MouseX = (int)((float)MouseInfo.X * RawMouseScale.X);
++		// 		MouseY = (int)((float)MouseInfo.Y * RawMouseScale.Y);
++		// 		flag = true;
++		// 	}
++		//
++		// 	MouseKeys.Clear();
++		// 	if (Main.instance.IsActive) {
++		// 		if (MouseInfo.LeftButton == ButtonState.Pressed) {
++		// 			MouseKeys.Add("Mouse1");
++		// 			flag = true;
++		// 		}
++		//
++		// 		if (MouseInfo.RightButton == ButtonState.Pressed) {
++		// 			MouseKeys.Add("Mouse2");
++		// 			flag = true;
++		// 		}
++		//
++		// 		if (MouseInfo.MiddleButton == ButtonState.Pressed) {
++		// 			MouseKeys.Add("Mouse3");
++		// 			flag = true;
++		// 		}
++		//
++		// 		if (MouseInfo.XButton1 == ButtonState.Pressed) {
++		// 			MouseKeys.Add("Mouse4");
++		// 			flag = true;
++		// 		}
++		//
++		// 		if (MouseInfo.XButton2 == ButtonState.Pressed) {
++		// 			MouseKeys.Add("Mouse5");
++		// 			flag = true;
++		// 		}
++		// 	}
++		//
++		// 	if (flag) {
++		// 		CurrentInputMode = InputMode.Mouse;
++		// 		Triggers.Current.UsedMovementKey = false;
++		// 	}
++		// }
++		//
++		// private static bool KeyboardInput() {
++		// 	bool flag = false;
++		// 	bool flag2 = false;
++		// 	List<Keys> pressedKeys = GetPressedKeys();
++		// 	DebugKeys(pressedKeys);
++		// 	if (pressedKeys.Count == 0 && MouseKeys.Count == 0) {
++		// 		Main.blockKey = Keys.None.ToString();
++		// 		return false;
++		// 	}
++		//
++		// 	for (int i = 0; i < pressedKeys.Count; i++) {
++		// 		if (pressedKeys[i] == Keys.LeftShift || pressedKeys[i] == Keys.RightShift)
++		// 			flag = true;
++		// 		else if (pressedKeys[i] == Keys.LeftAlt || pressedKeys[i] == Keys.RightAlt)
++		// 			flag2 = true;
++		//
++		// 		Main.ChromaPainter.PressKey(pressedKeys[i]);
++		// 	}
++		//
++		// 	if (Main.blockKey != Keys.None.ToString()) {
++		// 		bool flag3 = false;
++		// 		for (int j = 0; j < pressedKeys.Count; j++) {
++		// 			if (pressedKeys[j].ToString() == Main.blockKey) {
++		// 				pressedKeys[j] = Keys.None;
++		// 				flag3 = true;
++		// 			}
++		// 		}
++		//
++		// 		if (!flag3)
++		// 			Main.blockKey = Keys.None.ToString();
++		// 	}
++		//
++		// 	KeyConfiguration keyConfiguration = CurrentProfile.InputModes[InputMode.Keyboard];
++		// 	if (Main.gameMenu && !WritingText)
++		// 		keyConfiguration = CurrentProfile.InputModes[InputMode.KeyboardUI];
++		//
++		// 	List<string> list = new List<string>(pressedKeys.Count);
++		// 	for (int k = 0; k < pressedKeys.Count; k++) {
++		// 		list.Add(pressedKeys[k].ToString());
++		// 	}
++		//
++		// 	if (WritingText)
++		// 		list.Clear();
++		//
++		// 	int count = list.Count;
++		// 	list.AddRange(MouseKeys);
++		// 	bool flag4 = false;
++		// 	for (int l = 0; l < list.Count; l++) {
++		// 		if (l < count && pressedKeys[l] == Keys.None)
++		// 			continue;
++		//
++		// 		string newKey = list[l];
++		// 		if (!(list[l] == Keys.Tab.ToString()) || !((flag && SocialAPI.Mode == SocialMode.Steam) || flag2)) {
++		// 			if (CheckRebindingProcessKeyboard(newKey))
++		// 				return false;
++		//
++		// 			_ = Main.oldKeyState;
++		// 			if (l >= count || !Main.oldKeyState.IsKeyDown(pressedKeys[l]))
++		// 				keyConfiguration.Processkey(Triggers.Current, newKey);
++		// 			else
++		// 				keyConfiguration.CopyKeyState(Triggers.Old, Triggers.Current, newKey);
++		//
++		// 			if (l >= count || pressedKeys[l] != 0)
++		// 				flag4 = true;
++		// 		}
++		// 	}
++		//
++		// 	if (flag4)
++		// 		CurrentInputMode = InputMode.Keyboard;
++		//
++		// 	return flag4;
++		// }
  
- 		private static void FixKeysConflict(InputMode inputMode, List<string> triggers) {
- 			for (int i = 0; i < triggers.Count; i++) {
-@@ -1031,96 +_,96 @@
+ 		private static void DebugKeys(List<Keys> keys) {
+ 		}
+@@ -1033,96 +_,96 @@
  			CurrentProfile.InputModes[inputMode].KeyStatus[trigger].AddRange(OriginalProfiles[key].InputModes[inputMode].KeyStatus[trigger]);
  		}
  
@@ -1295,7 +1391,7 @@
  			if (CurrentProfile.HotbarAllowsRadial) {
  				int num = Triggers.Current.HotbarPlus.ToInt() - Triggers.Current.HotbarMinus.ToInt();
  				if (MiscSettingsTEMP.HotbarRadialShouldBeUsed) {
-@@ -1148,7 +_,7 @@
+@@ -1150,7 +_,7 @@
  				Vector2 vector = Vector2.Zero;
  				if (Main.gameMenu || (UILinkPointNavigator.Available && !InBuildingMode))
  					return;
@@ -1304,7 +1400,7 @@
  				switch (i) {
  					case 0:
  						flag = Triggers.Current.DpadMouseSnap1;
-@@ -1167,16 +_,16 @@
+@@ -1169,16 +_,16 @@
  						vector = -Vector2.UnitX;
  						break;
  				}
@@ -1325,7 +1421,7 @@
  						DpadSnapCooldown[i] = num;
  						zero += vector;
  					}
-@@ -1185,31 +_,31 @@
+@@ -1187,31 +_,31 @@
  					DpadSnapCooldown[i] = 0;
  				}
  			}
@@ -1363,7 +1459,7 @@
  			KeyConfiguration keyConfiguration = CurrentProfile.InputModes[inputMode];
  			if (Main.mapFullscreen && !Main.gameMenu) {
  				text += "          ";
-@@ -1227,14 +_,14 @@
+@@ -1229,14 +_,14 @@
  				text += BuildCommand(Lang.misc[59].Value, false, keyConfiguration.KeyStatus["HotbarMinus"], keyConfiguration.KeyStatus["HotbarPlus"]);
  				if (InBuildingMode)
  					text += BuildCommand(Lang.menu[6].Value, false, keyConfiguration.KeyStatus["Inventory"], keyConfiguration.KeyStatus["MouseRight"]);
@@ -1380,7 +1476,7 @@
  					bool flag = true;
  					bool flag2 = Main.SmartInteractProj != -1 || Main.HasInteractibleObjectThatIsNotATile;
  					bool flag3 = !Main.SmartInteractShowingGenuine && Main.SmartInteractShowingFake;
-@@ -1242,32 +_,32 @@
+@@ -1244,32 +_,32 @@
  						if (Main.SmartInteractNPC != -1) {
  							if (flag3)
  								flag = false;
@@ -1419,7 +1515,7 @@
  			return text;
  		}
  
-@@ -1299,15 +_,11 @@
+@@ -1301,15 +_,11 @@
  
  			if (!(triggerName == "SmartSelect")) {
  				if (triggerName == "SmartCursor" && inputMode == InputMode.Keyboard) {
@@ -1437,7 +1533,7 @@
  			}
  
  			return GenerateInputTag_ForCurrentGamemode(tagForGameplay, triggerName);
-@@ -1379,9 +_,7 @@
+@@ -1381,9 +_,7 @@
  		}
  
  		public static void PrettyPrintProfiles(ref string text) {
@@ -1448,7 +1544,7 @@
  
  			foreach (string text2 in array) {
  				if (text2.Contains(": {")) {
-@@ -1400,14 +_,6 @@
+@@ -1402,14 +_,6 @@
  			text = text.Replace("\r\n    ]", "]");
  		}
  
@@ -1463,7 +1559,7 @@
  		public static void Reset(KeyConfiguration c, PresetProfiles style, InputMode mode) {
  			switch (style) {
  				case PresetProfiles.Redigit:
-@@ -1415,8 +_,11 @@
+@@ -1417,8 +_,11 @@
  						case InputMode.Mouse:
  							break;
  						case InputMode.Keyboard:
@@ -1477,7 +1573,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1451,9 +_,12 @@
+@@ -1453,9 +_,12 @@
  							c.KeyStatus["ToggleCreativeMenu"].Add("C");
  							break;
  						case InputMode.KeyboardUI:
@@ -1492,7 +1588,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
-@@ -1517,14 +_,18 @@
+@@ -1519,14 +_,18 @@
  							c.KeyStatus["MenuRight"].Add(string.Concat(Buttons.DPadRight));
  							break;
  					}
@@ -1513,7 +1609,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1559,9 +_,12 @@
+@@ -1561,9 +_,12 @@
  							c.KeyStatus["ToggleCreativeMenu"].Add("C");
  							break;
  						case InputMode.KeyboardUI:
@@ -1528,7 +1624,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
-@@ -1624,14 +_,18 @@
+@@ -1626,14 +_,18 @@
  							c.KeyStatus["MenuRight"].Add(string.Concat(Buttons.DPadRight));
  							break;
  					}
@@ -1549,7 +1645,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1666,9 +_,12 @@
+@@ -1668,9 +_,12 @@
  							c.KeyStatus["ToggleCreativeMenu"].Add("C");
  							break;
  						case InputMode.KeyboardUI:
@@ -1564,7 +1660,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
-@@ -1731,14 +_,18 @@
+@@ -1733,14 +_,18 @@
  							c.KeyStatus["MenuRight"].Add(string.Concat(Buttons.DPadRight));
  							break;
  					}
@@ -1585,7 +1681,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Down"].Add("S");
  							c.KeyStatus["Left"].Add("A");
-@@ -1773,9 +_,12 @@
+@@ -1775,9 +_,12 @@
  							c.KeyStatus["ToggleCreativeMenu"].Add("C");
  							break;
  						case InputMode.KeyboardUI:
@@ -1600,7 +1696,7 @@
  							c.KeyStatus["Up"].Add("W");
  							c.KeyStatus["Up"].Add("Up");
  							c.KeyStatus["Down"].Add("S");
-@@ -1838,6 +_,7 @@
+@@ -1840,6 +_,7 @@
  							c.KeyStatus["MenuRight"].Add(string.Concat(Buttons.DPadRight));
  							break;
  					}
@@ -1608,7 +1704,7 @@
  					break;
  			}
  		}
-@@ -1862,7 +_,7 @@
+@@ -1864,7 +_,7 @@
  		}
  
  		public static void SetZoom_Test() {
@@ -1617,7 +1713,7 @@
  			Vector2 value = Main.screenPosition + new Vector2(_originalMouseX, _originalMouseY);
  			Vector2 value2 = Main.screenPosition + new Vector2(_originalLastMouseX, _originalLastMouseY);
  			Vector2 value3 = Main.screenPosition + new Vector2(0f, 0f);
-@@ -1873,29 +_,29 @@
+@@ -1875,29 +_,29 @@
  			_ = value4 - vector;
  			float scaleFactor = 1f / Main.GameViewMatrix.Zoom.X;
  			float num = 1f;
@@ -1655,7 +1751,7 @@
  			Main.lastMouseX = (int)vector3.X;
  			Main.lastMouseY = (int)vector3.Y;
  		}
-@@ -1927,12 +_,12 @@
+@@ -1929,12 +_,12 @@
  		}
  
  		private static void SetZoom_Scaled(float scale) {

@@ -3,6 +3,7 @@ using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader.Input.Keyboard;
+using Terraria.ModLoader.Input.Mouse;
 
 namespace Terraria.ModLoader.Input
 {
@@ -33,16 +34,15 @@ namespace Terraria.ModLoader.Input
 			PlayerInput.Triggers.Current.UsedMovementKey = false;
 
 			foreach (var item in KeyConfiguration.KeyStatus) {
-				if (item.Value.Contains("Mouse" + args.Button))
+				if (item.Value.Contains("Mouse" + (args.Button == MouseButton.Left ? "1" : "2")))
 					PlayerInput.Triggers.Current.KeyStatus[item.Key] = true;
 			}
 		}
 
 		public override void OnMouseUp(MouseButtonEventArgs args) {
 			foreach (var pair in KeyConfiguration.KeyStatus) {
-				if (pair.Value.Contains("Mouse" + args.Button)) {
+				if (pair.Value.Contains("Mouse" + (args.Button == MouseButton.Left ? "1" : "2")))
 					PlayerInput.Triggers.Current.KeyStatus[pair.Key] = false;
-				}
 			}
 		}
 
