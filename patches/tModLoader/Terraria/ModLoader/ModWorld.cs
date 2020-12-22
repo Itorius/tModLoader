@@ -8,7 +8,7 @@ namespace Terraria.ModLoader
 	/// <summary>
 	/// A ModWorld instance represents an extension of a World. You can store fields in the ModWorld classes to keep track of mod-specific information on the world. It also contains hooks to insert your code into the world generation process.
 	/// </summary>
-	public class ModWorld:ModType
+	public abstract class ModWorld : ModType
 	{
 		protected sealed override void Register() {
 			ModTypeLookup<ModWorld>.Register(this);
@@ -104,6 +104,13 @@ namespace Terraria.ModLoader
 		/// Called after drawing Tiles. Can be used for drawing a tile overlay akin to wires. Note that spritebatch should be begun and ended within this method.
 		/// </summary>
 		public virtual void PostDrawTiles() {
+		}
+
+		/// <summary>
+		/// Called after all other time calculations. Can be used to modify the speed at which time should progress per tick in seconds, along with the rate at which the world should update with it.
+		/// You may want to consider Main.fastForwardTime and CreativePowerManager.Instance.GetPower<CreativePowers.FreezeTime>().Enabled here.
+		/// </summary>
+		public virtual void ModifyTimeRate(ref int timeRate, ref int tileUpdateRate) {
 		}
 	}
 }
