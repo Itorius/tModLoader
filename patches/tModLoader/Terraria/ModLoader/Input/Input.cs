@@ -67,20 +67,27 @@ namespace Terraria.ModLoader.Input
 					if (args.Handled) break;
 				}
 			};
+
+			Main.OnRenderTargetsInitialized += (width, height) =>
+			{
+				WindowResizedEventArgs args = new WindowResizedEventArgs { Size = new Vector2(width, height) };
+
+				foreach (Layer layer in Layers) layer.OnWindowResize(args);
+			};
 		}
 
 		internal static void Update(GameTime time) {
 			PlayerInput.ScrollWheelDelta = 0;
 			PlayerInput.ScrollWheelDeltaForUI = 0;
 
-			if (_lastScreenWidth != Main.screenWidth || _lastScreenHeight != Main.screenHeight) {
-				WindowResizedEventArgs args = new WindowResizedEventArgs { Size = new Vector2(Main.screenWidth, Main.screenHeight) };
-
-				foreach (Layer layer in Layers) layer.OnWindowResize(args);
-
-				_lastScreenWidth = Main.screenWidth;
-				_lastScreenHeight = Main.screenHeight;
-			}
+			// if (_lastScreenWidth != Main.screenWidth || _lastScreenHeight != Main.screenHeight) {
+			// 	WindowResizedEventArgs args = new WindowResizedEventArgs { Size = new Vector2(Main.screenWidth, Main.screenHeight) };
+			//
+			// 	foreach (Layer layer in Layers) layer.OnWindowResize(args);
+			//
+			// 	_lastScreenWidth = Main.screenWidth;
+			// 	_lastScreenHeight = Main.screenHeight;
+			// }
 
 			MouseInput.Update(time);
 			KeyboardInput.Update(time);

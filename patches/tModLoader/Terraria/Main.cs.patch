@@ -8,7 +8,7 @@
  using Terraria.Achievements;
  using Terraria.Audio;
  using Terraria.Chat;
-@@ -65,6 +_,13 @@
+@@ -65,6 +_,14 @@
  using Terraria.IO;
  using Terraria.Localization;
  using Terraria.Map;
@@ -1052,6 +1052,30 @@
  					if (gameMenu)
  						UpdateMenu();
  
+@@ -12585,15 +_,15 @@
+ 				DoUpdate_AnimateWalls();
+ 				AnimateTiles();
+ 				DoUpdate_AnimateItemIcons();
+-				DoUpdate_F10_ToggleFPS();
++				// DoUpdate_F10_ToggleFPS();
+-				DoUpdate_F9_ToggleLighting();
++				// DoUpdate_F9_ToggleLighting();
+-				DoUpdate_F8_ToggleNetDiagnostics();
++				// DoUpdate_F8_ToggleNetDiagnostics();
+-				DoUpdate_F7_ToggleGraphicsDiagnostics();
++				// DoUpdate_F7_ToggleGraphicsDiagnostics();
+-				DoUpdate_F11_ToggleUI();
++				// DoUpdate_F11_ToggleUI();
+-				DoUpdate_AltEnter_ToggleFullscreen();
++				// DoUpdate_AltEnter_ToggleFullscreen();
+-				DoUpdate_HandleInput();
++				DoUpdate_HandleInput(gameTime);
+ 				DoUpdate_HandleChat();
+-				DoUpdate_Enter_ToggleChat();
++				// DoUpdate_Enter_ToggleChat();
+ 				if (gameMenu) {
+ 					UpdateMenu();
+ 					if (netMode != 2)
 @@ -12615,6 +_,8 @@
  
  			if (CanPauseGame()) {
@@ -1069,7 +1093,7 @@
  			if (!dedServ && (double)screenPosition.Y < worldSurface * 16.0 + 16.0 && netMode != 2) {
  				Star.UpdateStars();
  				Cloud.UpdateClouds();
-@@ -12806,6 +_,8 @@
+@@ -12806,6 +_,12 @@
  			if (InGameUI != null)
  				InGameUI.Update(gameTime);
  
@@ -1182,7 +1206,9 @@
  				ChatMessage message = ChatManager.Commands.CreateOutgoingMessage(chatText);
  				if (netMode == 1)
  					ChatHelper.SendChatMessageFromClient(message);
-@@ -13391,6 +_,7 @@
+@@ -13389,8 +_,9 @@
+ 			SoundEngine.PlaySound(11);
+ 		}
  
 -		private void DoUpdate_HandleInput() {
 +		private void DoUpdate_HandleInput(GameTime gameTime) {
@@ -2567,7 +2593,7 @@
  			}
  		}
  
-@@ -33169,7 +_,9 @@
+@@ -33169,7 +_,22 @@
  				SetupDrawInterfaceLayers();
  
  			PlayerInput.SetZoom_UI();
@@ -3126,6 +3152,14 @@
  		}
  
  		private void DoDraw(GameTime gameTime) {
+@@ -46881,7 +_,6 @@
+ 			_drawCycleCounter = (_drawCycleCounter + 1) % 5uL;
+ 			MenuUI.IsVisible = (gameMenu && menuMode == 888);
+ 			InGameUI.IsVisible = (!gameMenu && InGameUI.CurrentState != null);
+-			PlayerInput.UpdateMainMouse();
+ 			RefreshPlayerDrawOrder();
+ 			CaptureManager.Instance.DrawTick();
+ 			TimeLogger.NewDrawFrame();
 @@ -47167,8 +_,8 @@
  			UpdateAtmosphereTransparencyToSkyColor();
  			base.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
