@@ -33,7 +33,7 @@ namespace Terraria.ModLoader.Input
 			PlayerInput.Triggers.Current.UsedMovementKey = false;
 		}
 
-		private static string NamedMouseToNumber(MouseButton button)
+		internal static string NamedMouseToNumber(MouseButton button)
 		{
 			switch (button)
 			{
