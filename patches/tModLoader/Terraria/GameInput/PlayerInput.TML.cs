@@ -21,6 +21,8 @@ namespace Terraria.GameInput
 			if (reinitialize)
 				Reinitialize();
 
+			Triggers.Reset();
+			
 			VerifyBuildingMode();
 
 			Input.Update(gameTime);
@@ -31,6 +33,7 @@ namespace Terraria.GameInput
 			Main.mouseXButton1 = Triggers.Current.MouseXButton1;
 			Main.mouseXButton2 = Triggers.Current.MouseXButton2;
 
+			Triggers.Update();
 			// PostInput();
 			WritingText = false;
 
