@@ -1093,7 +1093,7 @@
  			if (!dedServ && (double)screenPosition.Y < worldSurface * 16.0 + 16.0 && netMode != 2) {
  				Star.UpdateStars();
  				Cloud.UpdateClouds();
-@@ -12806,8 +_,12 @@
+@@ -12806,8 +_,16 @@
  			if (InGameUI != null)
  				InGameUI.Update(gameTime);
  
