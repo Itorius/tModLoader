@@ -458,7 +458,10 @@ namespace Terraria.ModLoader
 			bestiaryDatabase.Merge(Main.ItemDropsDB);
 			
 			//Etc
-			Main.BestiaryUI = new UIBestiaryTest(Main.BestiaryDB);
+			
+			if (!Main.dedServ)
+				Main.BestiaryUI = new UIBestiaryTest(Main.BestiaryDB);
+			
 			Main.ItemDropSolver = new ItemDropResolver(itemDropDatabase);
 			Main.BestiaryTracker = new BestiaryUnlocksTracker();
 		}
@@ -526,6 +529,7 @@ namespace Terraria.ModLoader
 			GlobalBgStyleLoader.Unload();
 			WaterStyleLoader.Unload();
 			WaterfallStyleLoader.Unload();
+			PlayerDrawLayerHooks.Unload();
 			WorldHooks.Unload();
 			ResizeArrays(true);
 			for (int k = 0; k < Recipe.maxRecipes; k++) {
@@ -571,6 +575,7 @@ namespace Terraria.ModLoader
 			MountLoader.ResizeArrays();
 			BuffLoader.ResizeArrays();
 			PlayerHooks.RebuildHooks();
+			PlayerDrawLayerHooks.ResizeArrays();
 			WorldHooks.ResizeArrays();
 
 			if (!Main.dedServ) {
