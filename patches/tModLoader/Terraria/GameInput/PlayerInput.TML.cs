@@ -21,7 +21,7 @@ namespace Terraria.GameInput
 			if (reinitialize)
 				Reinitialize();
 
-			Triggers.Reset();
+			Triggers.Old = Triggers.Current.Clone();
 			
 			VerifyBuildingMode();
 
@@ -34,7 +34,6 @@ namespace Terraria.GameInput
 			Main.mouseXButton2 = Triggers.Current.MouseXButton2;
 
 			Triggers.Update();
-			// PostInput();
 			WritingText = false;
 
 			CacheZoomableValues();
