@@ -40,8 +40,37 @@ namespace Terraria.ModLoader.Input
 				}
 			};
 
-			MouseInput.MouseScroll += args => {
-				foreach (Layer layer in Layers) {
+			MouseInput.ButtonClicked += args =>
+			{
+				foreach (Layer layer in Layers)
+				{
+					layer.OnClick(args);
+					if (args.Handled) break;
+				}
+			};
+
+			MouseInput.ButtonDoubleClicked += args =>
+			{
+				foreach (Layer layer in Layers)
+				{
+					layer.OnDoubleClick(args);
+					if (args.Handled) break;
+				}
+			};
+
+			MouseInput.ButtonTripleClicked += args =>
+			{
+				foreach (Layer layer in Layers)
+				{
+					layer.OnTripleClick(args);
+					if (args.Handled) break;
+				}
+			};
+
+			MouseInput.MouseScroll += args =>
+			{
+				foreach (Layer layer in Layers)
+				{
 					layer.OnMouseScroll(args);
 					if (args.Handled) break;
 				}
