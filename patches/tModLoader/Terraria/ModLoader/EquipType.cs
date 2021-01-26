@@ -7,9 +7,12 @@ namespace Terraria.ModLoader
 	{
 		Head,
 		Body,
+		BodyComposite,
 		Legs,
 		HandsOn,
+		HandsOnComposite,
 		HandsOff,
+		HandsOffComposite,
 		Back,
 		Front,
 		Shoes,
