@@ -27,6 +27,33 @@
  			"Up",
  			"Down",
  			"Left",
+@@ -264,7 +_,7 @@
+ 			if (_fastUseItemInventorySlot >= 0 && _fastUseItemInventorySlot != -2) {
+ 				Player localPlayer = Main.LocalPlayer;
+ 				if (localPlayer.inventory[_fastUseItemInventorySlot].IsAir)
+-					Utils.Swap(ref Main.mouseItem, ref localPlayer.inventory[_fastUseItemInventorySlot]);
++					Utils.Swap(ref Main.mouseItem, ref localPlayer.inventory.Items[_fastUseItemInventorySlot]);
+ 			}
+ 
+ 			_fastUseItemInventorySlot = -1;
+@@ -277,7 +_,7 @@
+ 			if (Main.mouseItem.stack <= 0) {
+ 				int uIPointForBuildingMode = _UIPointForBuildingMode;
+ 				if (uIPointForBuildingMode < 50 && uIPointForBuildingMode >= 0 && Main.player[Main.myPlayer].inventory[uIPointForBuildingMode].stack > 0)
+-					Utils.Swap(ref Main.mouseItem, ref Main.player[Main.myPlayer].inventory[uIPointForBuildingMode]);
++					Utils.Swap(ref Main.mouseItem, ref Main.player[Main.myPlayer].inventory.Items[uIPointForBuildingMode]);
+ 			}
+ 		}
+ 
+@@ -288,7 +_,7 @@
+ 			if (Main.mouseItem.stack > 0 && Main.player[Main.myPlayer].itemAnimation == 0) {
+ 				int uIPointForBuildingMode = _UIPointForBuildingMode;
+ 				if (uIPointForBuildingMode < 50 && uIPointForBuildingMode >= 0 && Main.player[Main.myPlayer].inventory[uIPointForBuildingMode].stack <= 0)
+-					Utils.Swap(ref Main.mouseItem, ref Main.player[Main.myPlayer].inventory[uIPointForBuildingMode]);
++					Utils.Swap(ref Main.mouseItem, ref Main.player[Main.myPlayer].inventory.Items[uIPointForBuildingMode]);
+ 			}
+ 
+ 			_UIPointForBuildingMode = -1;
 @@ -319,6 +_,11 @@
  		public static void Initialize() {
  			Main.InputProfiles.OnProcessText += PrettyPrintProfiles;

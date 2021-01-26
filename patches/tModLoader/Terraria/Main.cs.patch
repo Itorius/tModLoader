@@ -1121,7 +1121,7 @@
 +				layer.OnUpdate(gameTime);
 +			}
 +
-+			ModHooks.UpdateUI(gameTime);
++			SystemHooks.UpdateUI(gameTime);
 +			PlayerInput.ScrollWheelDeltaForUI = 0;
  			CreativeMenu.Update(gameTime);
 +
@@ -1275,7 +1275,7 @@
 +		private void DoUpdate_HandleInput(GameTime gameTime) {
 -			PlayerInput.UpdateInput();
 +			PlayerInput.UpdateInput(gameTime);
-+			ModHooks.PostUpdateInput();
++			SystemHooks.PostUpdateInput();
  			UpdateViewZoomKeys();
  			PlayerInput.SetZoom_Unscaled();
  			UILinkPointNavigator.Update();
@@ -2646,7 +2646,7 @@
  
  			PlayerInput.SetZoom_UI();
 +			List<GameInterfaceLayer> interfaceLayers = new List<GameInterfaceLayer>(_gameInterfaceLayers);
-+			ModHooks.ModifyInterfaceLayers(interfaceLayers);
++			SystemHooks.ModifyInterfaceLayers(interfaceLayers);
 +
 +			int mouseTextIndex = interfaceLayers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
 +
