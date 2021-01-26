@@ -10,12 +10,11 @@ namespace Terraria.ModLoader.Input
 		private static int _lastScreenWidth;
 		private static int _lastScreenHeight;
 
-		internal static LayerStack Layers;
+		public static LayerStack Layers;
 
 		internal static void Load() {
 			Layers = new LayerStack();
 			Layers.PushLayer(new TerrariaLayer());
-			Layers.PushOverlay(new UILayer());
 
 			MouseInput.Load();
 			KeyboardInput.Load();
@@ -99,7 +98,7 @@ namespace Terraria.ModLoader.Input
 
 			Main.OnRenderTargetsInitialized += (width, height) =>
 			{
-				WindowResizedEventArgs args = new WindowResizedEventArgs { Size = new Vector2(width, height) };
+				WindowResizedEventArgs args = new WindowResizedEventArgs(new Vector2(width, height));
 
 				foreach (Layer layer in Layers) layer.OnWindowResize(args);
 			};

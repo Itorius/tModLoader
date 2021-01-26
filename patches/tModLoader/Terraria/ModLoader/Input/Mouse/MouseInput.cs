@@ -29,9 +29,9 @@ namespace Terraria.ModLoader.Input.Mouse
 
 		private static MouseState previous;
 
-		internal static MouseState Mouse;
+		public static MouseState Mouse;
 
-		internal static KeyboardState Keyboard;
+		public static KeyboardState Keyboard;
 
 		private static Dictionary<MouseButton, LastClick> lastClicks;
 
@@ -112,64 +112,64 @@ namespace Terraria.ModLoader.Input.Mouse
 			Vector2 position = new Vector2(Mouse.X, Mouse.Y);
 
 			if (Mouse.LeftButton == ButtonState.Pressed && previous.LeftButton == ButtonState.Released)
-				OnButtonPressed(new MouseButtonEventArgs { Button = MouseButton.Left, Modifiers = modifiers, Position = position });
+				OnButtonPressed(new MouseButtonEventArgs(position, MouseButton.Left, modifiers));
 
 			if (Mouse.MiddleButton == ButtonState.Pressed && previous.MiddleButton == ButtonState.Released)
-				OnButtonPressed(new MouseButtonEventArgs { Button = MouseButton.Middle, Modifiers = modifiers, Position = position });
+				OnButtonPressed(new MouseButtonEventArgs(position, MouseButton.Middle, modifiers));
 
 			if (Mouse.RightButton == ButtonState.Pressed && previous.RightButton == ButtonState.Released)
-				OnButtonPressed(new MouseButtonEventArgs { Button = MouseButton.Right, Modifiers = modifiers, Position = position });
+				OnButtonPressed(new MouseButtonEventArgs(position, MouseButton.Right, modifiers));
 
 			if (Mouse.XButton1 == ButtonState.Pressed && previous.XButton1 == ButtonState.Released)
-				OnButtonPressed(new MouseButtonEventArgs { Button = MouseButton.XButton1, Modifiers = modifiers, Position = position });
+				OnButtonPressed(new MouseButtonEventArgs(position, MouseButton.XButton1, modifiers));
 
 			if (Mouse.XButton2 == ButtonState.Pressed && previous.XButton2 == ButtonState.Released)
-				OnButtonPressed(new MouseButtonEventArgs { Button = MouseButton.XButton2, Modifiers = modifiers, Position = position });
+				OnButtonPressed(new MouseButtonEventArgs(position, MouseButton.XButton2, modifiers));
 
 			if (Mouse.LeftButton == ButtonState.Pressed && previous.LeftButton == ButtonState.Released)
-				OnButtonClicked(new MouseButtonEventArgs { Button = MouseButton.Left, Modifiers = modifiers, Position = position });
+				OnButtonClicked(new MouseButtonEventArgs(position, MouseButton.Left, modifiers));
 
 			if (Mouse.MiddleButton == ButtonState.Pressed && previous.MiddleButton == ButtonState.Released)
-				OnButtonClicked(new MouseButtonEventArgs { Button = MouseButton.Middle, Modifiers = modifiers, Position = position });
+				OnButtonClicked(new MouseButtonEventArgs(position, MouseButton.Middle, modifiers));
 
 			if (Mouse.RightButton == ButtonState.Pressed && previous.RightButton == ButtonState.Released)
-				OnButtonClicked(new MouseButtonEventArgs { Button = MouseButton.Right, Modifiers = modifiers, Position = position });
+				OnButtonClicked(new MouseButtonEventArgs(position, MouseButton.Right, modifiers));
 
 			if (Mouse.XButton1 == ButtonState.Pressed && previous.XButton1 == ButtonState.Released)
-				OnButtonClicked(new MouseButtonEventArgs { Button = MouseButton.XButton1, Modifiers = modifiers, Position = position });
+				OnButtonClicked(new MouseButtonEventArgs(position, MouseButton.XButton1, modifiers));
 
 			if (Mouse.XButton2 == ButtonState.Pressed && previous.XButton2 == ButtonState.Released)
-				OnButtonClicked(new MouseButtonEventArgs { Button = MouseButton.XButton2, Modifiers = modifiers, Position = position });
+				OnButtonClicked(new MouseButtonEventArgs(position, MouseButton.XButton2, modifiers));
 
 			if (Mouse.LeftButton == ButtonState.Released && previous.LeftButton == ButtonState.Pressed)
-				OnButtonReleased(new MouseButtonEventArgs { Button = MouseButton.Left, Modifiers = modifiers, Position = position });
+				OnButtonReleased(new MouseButtonEventArgs(position, MouseButton.Left, modifiers));
 
 			if (Mouse.MiddleButton == ButtonState.Released && previous.MiddleButton == ButtonState.Pressed)
-				OnButtonReleased(new MouseButtonEventArgs { Button = MouseButton.Middle, Modifiers = modifiers, Position = position });
+				OnButtonReleased(new MouseButtonEventArgs(position, MouseButton.Middle, modifiers));
 
 			if (Mouse.RightButton == ButtonState.Released && previous.RightButton == ButtonState.Pressed)
-				OnButtonReleased(new MouseButtonEventArgs { Button = MouseButton.Right, Modifiers = modifiers, Position = position });
+				OnButtonReleased(new MouseButtonEventArgs(position, MouseButton.Right, modifiers));
 
 			if (Mouse.XButton1 == ButtonState.Released && previous.XButton1 == ButtonState.Pressed)
-				OnButtonReleased(new MouseButtonEventArgs { Button = MouseButton.XButton1, Modifiers = modifiers, Position = position });
+				OnButtonReleased(new MouseButtonEventArgs(position, MouseButton.XButton1, modifiers));
 
 			if (Mouse.XButton2 == ButtonState.Released && previous.XButton2 == ButtonState.Pressed)
-				OnButtonReleased(new MouseButtonEventArgs { Button = MouseButton.XButton2, Modifiers = modifiers, Position = position });
+				OnButtonReleased(new MouseButtonEventArgs(position, MouseButton.XButton2, modifiers));
 
 			bool buttonDown = Mouse.LeftButton == ButtonState.Pressed || Mouse.MiddleButton == ButtonState.Pressed || Mouse.RightButton == ButtonState.Pressed || Mouse.XButton1 == ButtonState.Pressed || Mouse.XButton2 == ButtonState.Pressed;
 
 			if (previous.X != Mouse.X || previous.Y != Mouse.Y) {
 				if (buttonDown)
-					OnMouseDragged(new MouseEventArgs { Position = position });
+					OnMouseDragged(new MouseEventArgs(position));
 
 				if (MoveRaisedOnDrag || !buttonDown)
-					OnMouseMoved(new MouseMoveEventArgs { Position = position, Delta = new Vector2(Mouse.X - previous.X, Mouse.Y - previous.Y) });
+					OnMouseMoved(new MouseMoveEventArgs(position, new Vector2(Mouse.X - previous.X, Mouse.Y - previous.Y)));
 			}
 
 			if (previous.ScrollWheelValue != Mouse.ScrollWheelValue) {
 				int value = Mouse.ScrollWheelValue;
 				int delta = Mouse.ScrollWheelValue - previous.ScrollWheelValue;
-				OnMouseScroll(new MouseScrollEventArgs { Position = position, Offset = new Vector2(0, delta) });
+				OnMouseScroll(new MouseScrollEventArgs(position, new Vector2(0, delta)));
 			}
 
 			previous = Mouse;

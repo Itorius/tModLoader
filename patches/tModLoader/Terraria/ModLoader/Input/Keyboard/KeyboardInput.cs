@@ -1,8 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Terraria;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace Terraria.ModLoader.Input.Keyboard
 {
@@ -47,10 +46,11 @@ namespace Terraria.ModLoader.Input.Keyboard
 			KeyTyped?.Invoke(args);
 		}
 
-		public static bool IsKeyDown(Keys key) {
+		public static bool IsKeyDown(Keys key)
+		{
 			return current.IsKeyDown(key);
 		}
-		
+
 		public static event Action<KeyboardEventArgs> KeyPressed;
 
 		public static event Action<KeyboardEventArgs> KeyReleased;
@@ -79,18 +79,8 @@ namespace Terraria.ModLoader.Input.Keyboard
 			{
 				if (current.IsKeyDown(key) && previous.IsKeyUp(key))
 				{
-					OnKeyPressed(new KeyboardEventArgs
-					{
-						Character = KeyboardUtil.ToChar(key, modifiers),
-						Modifiers = modifiers,
-						Key = key
-					});
-					OnKeyTyped(new KeyboardEventArgs
-					{
-						Character = KeyboardUtil.ToChar(key, modifiers),
-						Modifiers = modifiers,
-						Key = key
-					});
+					OnKeyPressed(new KeyboardEventArgs(modifiers, key, KeyboardUtil.ToChar(key, modifiers)));
+					OnKeyTyped(new KeyboardEventArgs(modifiers, key, KeyboardUtil.ToChar(key, modifiers)));
 
 					lastKey = key;
 					lastPress = gameTime.TotalGameTime;
@@ -102,12 +92,7 @@ namespace Terraria.ModLoader.Input.Keyboard
 			{
 				if (current.IsKeyUp(key) && previous.IsKeyDown(key))
 				{
-					OnKeyReleased(new KeyboardEventArgs
-					{
-						Character = KeyboardUtil.ToChar(key, modifiers),
-						Modifiers = modifiers,
-						Key = key
-					});
+					OnKeyReleased(new KeyboardEventArgs(modifiers, key, KeyboardUtil.ToChar(key, modifiers)));
 				}
 			}
 
@@ -115,12 +100,7 @@ namespace Terraria.ModLoader.Input.Keyboard
 
 			if (current.IsKeyDown(lastKey) && (isInitial && elapsedTime > InitialDelay || !isInitial && elapsedTime > RepeatDelay))
 			{
-				OnKeyTyped(new KeyboardEventArgs
-				{
-					Character = KeyboardUtil.ToChar(lastKey, modifiers),
-					Modifiers = modifiers,
-					Key = lastKey
-				});
+				OnKeyTyped(new KeyboardEventArgs(modifiers, lastKey, KeyboardUtil.ToChar(lastKey, modifiers)));
 				lastPress = gameTime.TotalGameTime;
 				isInitial = false;
 			}
