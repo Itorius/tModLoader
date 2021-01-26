@@ -11,6 +11,11 @@ namespace Terraria.ModLoader.Input
 		public float Width => Size.X;
 
 		public float Height => Size.Y;
+
+		public WindowResizedEventArgs(Vector2 size)
+		{
+			Size = size;
+		}
 	}
 
 	public class InputEventArgs
@@ -25,6 +30,11 @@ namespace Terraria.ModLoader.Input
 		public float X => Position.X;
 
 		public float Y => Position.Y;
+
+		public MouseEventArgs(Vector2 position)
+		{
+			Position = position;
+		}
 	}
 
 	public class KeyboardEventArgs : InputEventArgs
@@ -34,6 +44,13 @@ namespace Terraria.ModLoader.Input
 		public Keys Key { get; internal set; }
 
 		public char? Character { get; internal set; }
+
+		public KeyboardEventArgs(Modifiers modifiers, Keys key, char? character)
+		{
+			Modifiers = modifiers;
+			Key = key;
+			Character = character;
+		}
 	}
 
 	public class MouseScrollEventArgs : MouseEventArgs
@@ -43,6 +60,11 @@ namespace Terraria.ModLoader.Input
 		public float OffsetX => Offset.X;
 
 		public float OffsetY => Offset.Y;
+
+		public MouseScrollEventArgs(Vector2 position, Vector2 offset) : base(position)
+		{
+			Offset = offset;
+		}
 	}
 
 	public class MouseButtonEventArgs : MouseEventArgs
@@ -50,6 +72,12 @@ namespace Terraria.ModLoader.Input
 		public MouseButton Button { get; internal set; }
 
 		public Modifiers Modifiers { get; internal set; }
+
+		public MouseButtonEventArgs(Vector2 position, MouseButton button, Modifiers modifiers) : base(position)
+		{
+			Button = button;
+			Modifiers = modifiers;
+		}
 	}
 
 	public class MouseMoveEventArgs : MouseEventArgs
@@ -59,5 +87,10 @@ namespace Terraria.ModLoader.Input
 		public float DeltaX => Delta.X;
 
 		public float DeltaY => Delta.Y;
+
+		public MouseMoveEventArgs(Vector2 position, Vector2 delta) : base(position)
+		{
+			Delta = delta;
+		}
 	}
 }
