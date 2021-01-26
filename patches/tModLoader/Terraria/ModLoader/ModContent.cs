@@ -407,9 +407,9 @@ namespace Terraria.ModLoader
 			RefreshModLanguage(Language.ActiveCulture);
 			MapLoader.SetupModMap();
 			RarityLoader.Initialize();
+			PlayerInput.Reinitialize();
 			
 			ContentSamples.Initialize();
-			PlayerInput.reinitialize = true;
 			SetupBestiary(token);
 			SetupRecipes(token);
 			ContentSamples.RebuildItemCreativeSortingIDsAfterRecipesAreSetUp();

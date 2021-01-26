@@ -1,13 +1,22 @@
 --- src/Terraria/Terraria/GameInput/PlayerInput.cs
 +++ src/tModLoader/Terraria/GameInput/PlayerInput.cs
-@@ -8,6 +_,7 @@
+@@ -8,13 +_,15 @@
  using Terraria.GameContent.UI.Chat;
  using Terraria.GameContent.UI.States;
  using Terraria.ID;
 +using Terraria.ModLoader;
++using Terraria.ModLoader.Input;
  using Terraria.Social;
  using Terraria.UI;
  using Terraria.UI.Gamepad;
+ 
+ namespace Terraria.GameInput
+ {
+-	public class PlayerInput
++	public partial class PlayerInput
+ 	{
+ 		public class MiscSettingsTEMP
+ 		{
 @@ -26,6 +_,9 @@
  		public static List<string> KnownTriggers = new List<string> {
  			"MouseLeft",
@@ -18,51 +27,14 @@
  			"Up",
  			"Down",
  			"Left",
-@@ -264,7 +_,7 @@
- 			if (_fastUseItemInventorySlot >= 0 && _fastUseItemInventorySlot != -2) {
- 				Player localPlayer = Main.LocalPlayer;
- 				if (localPlayer.inventory[_fastUseItemInventorySlot].IsAir)
--					Utils.Swap(ref Main.mouseItem, ref localPlayer.inventory[_fastUseItemInventorySlot]);
-+					Utils.Swap(ref Main.mouseItem, ref ((Item[])localPlayer.inventory)[_fastUseItemInventorySlot]);
- 			}
- 
- 			_fastUseItemInventorySlot = -1;
-@@ -277,7 +_,7 @@
- 			if (Main.mouseItem.stack <= 0) {
- 				int uIPointForBuildingMode = _UIPointForBuildingMode;
- 				if (uIPointForBuildingMode < 50 && uIPointForBuildingMode >= 0 && Main.player[Main.myPlayer].inventory[uIPointForBuildingMode].stack > 0)
--					Utils.Swap(ref Main.mouseItem, ref Main.player[Main.myPlayer].inventory[uIPointForBuildingMode]);
-+					Utils.Swap(ref Main.mouseItem, ref ((Item[])Main.player[Main.myPlayer].inventory)[uIPointForBuildingMode]);
- 			}
- 		}
- 
-@@ -288,7 +_,7 @@
- 			if (Main.mouseItem.stack > 0 && Main.player[Main.myPlayer].itemAnimation == 0) {
- 				int uIPointForBuildingMode = _UIPointForBuildingMode;
- 				if (uIPointForBuildingMode < 50 && uIPointForBuildingMode >= 0 && Main.player[Main.myPlayer].inventory[uIPointForBuildingMode].stack <= 0)
--					Utils.Swap(ref Main.mouseItem, ref Main.player[Main.myPlayer].inventory[uIPointForBuildingMode]);
-+					Utils.Swap(ref Main.mouseItem, ref ((Item[])Main.player[Main.myPlayer].inventory)[uIPointForBuildingMode]);
- 			}
- 
- 			_UIPointForBuildingMode = -1;
-@@ -316,9 +_,21 @@
- 			}
- 		}
- 
-+		// To allow mod hotkeys to load, need to reinitialize after load.
-+		internal static bool reinitialize;
-+		private static void ReInitialize() {
-+			Profiles.Clear();
-+			OriginalProfiles.Clear();
-+			Initialize_Inner(); //Mirsario: To not repeat code in patches, reuse the one that was previously in Initialize().
-+			Load(); // Loads the JSON into the Profiles above
-+			reinitialize = false;
-+		}
+@@ -319,6 +_,11 @@
  		public static void Initialize() {
  			Main.InputProfiles.OnProcessText += PrettyPrintProfiles;
  			Player.Hooks.OnEnterWorld += Hook_OnEnterWorld;
 +			Initialize_Inner();
++			Input.Load();
 +		}
++		
 +		private static void Initialize_Inner() {
  			PlayerInputProfile playerInputProfile = new PlayerInputProfile("Redigit's Pick");
  			playerInputProfile.Initialize(PresetProfiles.Redigit);
@@ -78,17 +50,16 @@
  			Dictionary<string, PlayerInputProfile> dictionary = new Dictionary<string, PlayerInputProfile>();
  			string currentValue = null;
  			Main.InputProfiles.Get("Selected Profile", ref currentValue);
-@@ -496,6 +_,9 @@
+@@ -495,7 +_,7 @@
+ 			}
  		}
  
- 		public static void UpdateInput() {
-+			if (reinitialize)
-+				ReInitialize();
-+
+-		public static void UpdateInput() {
++		private static void UpdateInput() {
  			Triggers.Reset();
  			ScrollWheelValueOld = ScrollWheelValue;
  			ScrollWheelValue = 0;
-@@ -526,6 +_,9 @@
+@@ -526,12 +_,15 @@
  			UpdateMainMouse();
  			Main.mouseLeft = Triggers.Current.MouseLeft;
  			Main.mouseRight = Triggers.Current.MouseRight;
@@ -98,6 +69,13 @@
  			CacheZoomableValues();
  			if (num != 0 && PlayerInput.OnActionableInput != null)
  				PlayerInput.OnActionableInput();
+ 		}
+ 
+-		public static void UpdateMainMouse() {
++		private static void UpdateMainMouse() {
+ 			Main.lastMouseX = Main.mouseX;
+ 			Main.lastMouseY = Main.mouseY;
+ 			Main.mouseX = MouseX;
 @@ -716,6 +_,8 @@
  				flag = true;
  			}

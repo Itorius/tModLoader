@@ -8,3 +8,26 @@
  			public static int FANCYUI_HIGHEST_INDEX = 1;
  			public static int FANCYUI_SPECIAL_INSTRUCTIONS = 0;
  			public static int INFOACCCOUNT = 0;
+@@ -109,8 +_,8 @@
+ 					flag = false;
+ 			}
+ 
+-			if (flag && PlayerInput.NavigatorRebindingLock > 0)
++			// if (flag && PlayerInput.NavigatorRebindingLock > 0)
+-				flag = false;
++				// flag = false;
+ 
+ 			if (flag && !Main.gameMenu && !PlayerInput.UsingGamepadUI)
+ 				flag = false;
+@@ -250,6 +_,11 @@
+ 
+ 				PlayerInput.MouseX = (int)vector.X;
+ 				PlayerInput.MouseY = (int)vector.Y;
++				
++				Main.lastMouseX = Main.mouseX;
++				Main.lastMouseY = Main.mouseY;
++				Main.mouseX = PlayerInput.MouseX;
++				Main.mouseY = PlayerInput.MouseY;
+ 			}
+ 
+ 			ResetFlagsEnd();
