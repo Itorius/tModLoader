@@ -1,5 +1,12 @@
 --- src/Terraria/Terraria/Chest.cs
 +++ src/tModLoader/Terraria/Chest.cs
+@@ -1,5 +_,6 @@
+ using Microsoft.Xna.Framework;
+ using System.Collections.Generic;
++using System.Linq;
+ using Terraria.Audio;
+ using Terraria.DataStructures;
+ using Terraria.GameContent.Achievements;
 @@ -7,6 +_,7 @@
  using Terraria.GameContent.Events;
  using Terraria.ID;
@@ -130,7 +137,7 @@
  		}
  
  		public static void SetupTravelShop() {
-@@ -874,9 +_,12 @@
+@@ -874,12 +_,31 @@
  							Main.travelShop[num2++] = 3636;
  							Main.travelShop[num2++] = 3641;
  							break;
@@ -143,11 +150,22 @@
  		}
  
  		public void SetupShop(int type) {
-@@ -2553,6 +_,7 @@
- 					array[num++].SetDefaults(4921);
- 			}
- 
-+			NPCLoader.SetupShop(type, this, ref num);
- 			for (int num12 = 0; num12 < num; num12++) {
- 				array[num12].isAShopItem = true;
- 			}
++			type = NPCShopManager.ShopIDToNPCID(type);
++		
++			for (int i = 0; i < 40; i++) item[i] = new Item();
++
++			NPCShop s = NPCShopManager.GetShop(type);
++
++			int nextSlot = 0;
++			foreach (NPCShop.Entry entry in s.pages.SelectMany(x => x.Value.entries))
++			{
++				if (entry.Conditions.Any(x => !x.ItemAvailable(entry))) continue;
++				
++				item[nextSlot++] = entry.item;
++			}
++			
++			return;
++			
+ 			bool flag = Main.LocalPlayer.currentShoppingSettings.PriceAdjustment <= 0.8500000238418579;
+ 			Item[] array = item;
+ 			for (int i = 0; i < 40; i++) {

@@ -815,6 +815,15 @@
  #if SERVER
  			netMode = 2;
  #endif
+@@ -4974,7 +_,7 @@
+ 			Chest.SetupTravelShop();
+ 			for (int m = 1; m < 100; m++) {
+ 				shop[m] = new Chest();
+-				shop[m].SetupShop(m);
++				// shop[m].SetupShop(m);
+ 			}
+ 
+ 			teamColor[0] = Microsoft.Xna.Framework.Color.White;
 @@ -5037,7 +_,7 @@
  			}
  

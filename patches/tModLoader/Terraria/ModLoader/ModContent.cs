@@ -412,6 +412,7 @@ namespace Terraria.ModLoader
 			ContentSamples.Initialize();
 			SetupBestiary(token);
 			SetupRecipes(token);
+			SetupShops(token);
 			ContentSamples.RebuildItemCreativeSortingIDsAfterRecipesAreSetUp();
 			ItemSorting.SetupWhiteLists();
 
@@ -482,6 +483,14 @@ namespace Terraria.ModLoader
 			Recipe.SetupRecipes();
 			RecipeHooks.setupRecipes = false;
 		}
+		
+		private static void SetupShops(CancellationToken token) {
+			NPCShopManager.Initialize();
+
+			foreach (KeyValuePair<int, NPC> item in ContentSamples.NpcsByNetId) {
+				NPCLoader.SetupShop(item.Value);
+			}
+		}
 
 		internal static void UnloadModContent() {
 			MenuLoader.Unload(); //do this early, so modded menus won't be active when unloaded
@@ -518,6 +527,7 @@ namespace Terraria.ModLoader
 			ProjectileLoader.Unload();
 			NPCLoader.Unload();
 			NPCHeadLoader.Unload();
+			NPCShopManager.Unload();
 			PlayerHooks.Unload();
 			BuffLoader.Unload();
 			MountLoader.Unload();

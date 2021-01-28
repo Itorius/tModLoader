@@ -641,7 +641,7 @@ namespace Terraria.ModLoader
 		/// </summary>
 		/// <param name="shop"></param>
 		/// <param name="nextSlot"></param>
-		public virtual void SetupShop(Chest shop, ref int nextSlot) {
+		public virtual void SetupShop() {
 		}
 
 		/// <summary>
