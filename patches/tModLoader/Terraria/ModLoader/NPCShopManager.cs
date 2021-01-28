@@ -96,32 +96,41 @@ namespace Terraria.ModLoader
 			// 		break;
 			// 	}
 
-			// pylons
-// 			if (type != 19 && type != 20 && flag && !Main.player[Main.myPlayer].ZoneCorrupt && !Main.player[Main.myPlayer].ZoneCrimson) {
-// 				if (!Main.player[Main.myPlayer].ZoneSnow && !Main.player[Main.myPlayer].ZoneDesert && !Main.player[Main.myPlayer].ZoneBeach && !Main.player[Main.myPlayer].ZoneJungle && !Main.player[Main.myPlayer].ZoneHallow && !Main.player[Main.myPlayer].ZoneGlowshroom && (double)(Main.player[Main.myPlayer].Center.Y / 16f) < Main.worldSurface && num < 39)
-// 					array[num++].SetDefaults(4876);
-//
-// 				if (Main.player[Main.myPlayer].ZoneSnow && num < 39)
-// 					array[num++].SetDefaults(4920);
-//
-// 				if (Main.player[Main.myPlayer].ZoneDesert && num < 39)
-// 					array[num++].SetDefaults(4919);
-//
-// 				if (!Main.player[Main.myPlayer].ZoneSnow && !Main.player[Main.myPlayer].ZoneDesert && !Main.player[Main.myPlayer].ZoneBeach && !Main.player[Main.myPlayer].ZoneJungle && !Main.player[Main.myPlayer].ZoneHallow && !Main.player[Main.myPlayer].ZoneGlowshroom && (double)(Main.player[Main.myPlayer].Center.Y / 16f) >= Main.worldSurface && num < 39)
-// 					array[num++].SetDefaults(4917);
-//
-// 				if (Main.player[Main.myPlayer].ZoneBeach && (double)Main.player[Main.myPlayer].position.Y < Main.worldSurface * 16.0 && num < 39)
-// 					array[num++].SetDefaults(4918);
-// i
-// 				if (Main.player[Main.myPlayer].ZoneJungle && num < 39)
-// 					array[num++].SetDefaults(4875);
-//
-// 				if (Main.player[Main.myPlayer].ZoneHallow && num < 39)
-// 					array[num++].SetDefaults(4916);
-//
-// 				if (Main.player[Main.myPlayer].ZoneGlowshroom && num < 39)
-// 					array[num++].SetDefaults(4921);
-// 			}
+			SetupShop_Pylons();
+		}
+
+		private static void SetupShop_Pylons()
+		{
+			// note: allow modded NPC to sell pylons?
+			foreach (KeyValuePair<int, NPCShop> pair in shops)
+			{
+				if (pair.Key == NPCID.TravellingMerchant || pair.Key == NPCID.SkeletonMerchant || Main.LocalPlayer.currentShoppingSettings.PriceAdjustment <= 0.8500000238418579) continue;
+				if (Main.LocalPlayer.ZoneCrimson || Main.LocalPlayer.ZoneCorrupt) continue;
+
+				if (!Main.LocalPlayer.ZoneSnow && !Main.LocalPlayer.ZoneDesert && !Main.LocalPlayer.ZoneBeach && !Main.LocalPlayer.ZoneJungle && !Main.LocalPlayer.ZoneHallow && !Main.LocalPlayer.ZoneGlowshroom && Main.LocalPlayer.Center.Y / 16f < Main.worldSurface)
+					pair.Value.CreateEntry(4876);
+
+				if (Main.LocalPlayer.ZoneSnow)
+					pair.Value.CreateEntry(4920);
+
+				if (Main.LocalPlayer.ZoneDesert)
+					pair.Value.CreateEntry(4919);
+
+				if (!Main.LocalPlayer.ZoneSnow && !Main.LocalPlayer.ZoneDesert && !Main.LocalPlayer.ZoneBeach && !Main.LocalPlayer.ZoneJungle && !Main.LocalPlayer.ZoneHallow && !Main.LocalPlayer.ZoneGlowshroom && Main.LocalPlayer.Center.Y / 16f >= Main.worldSurface)
+					pair.Value.CreateEntry(4917);
+
+				if (Main.LocalPlayer.ZoneBeach && Main.LocalPlayer.position.Y < Main.worldSurface * 16.0)
+					pair.Value.CreateEntry(4918);
+
+				if (Main.LocalPlayer.ZoneJungle)
+					pair.Value.CreateEntry(4875);
+
+				if (Main.LocalPlayer.ZoneHallow)
+					pair.Value.CreateEntry(4916);
+
+				if (Main.LocalPlayer.ZoneGlowshroom)
+					pair.Value.CreateEntry(4921);
+			}
 		}
 
 		private static void SetupShop_Zoologist()
