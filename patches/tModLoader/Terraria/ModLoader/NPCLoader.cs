@@ -928,15 +928,6 @@ namespace Terraria.ModLoader
 			}
 		}
 
-		private delegate void DelegateSetupTravelShop(int[] shop, ref int nextSlot);
-		private static HookList HookSetupTravelShop = AddHook<DelegateSetupTravelShop>(g => g.SetupTravelShop);
-
-		public static void SetupTravelShop(int[] shop, ref int nextSlot) {
-			foreach (GlobalNPC g in HookSetupTravelShop.Enumerate()) {
-				g.SetupTravelShop(shop, ref nextSlot);
-			}
-		}
-
 		private static HookList HookCanGoToStatue = AddHook<Func<NPC, bool, bool?>>(g => g.CanGoToStatue);
 
 		public static bool CanGoToStatue(NPC npc, bool toKingStatue, bool vanillaCanGo) {

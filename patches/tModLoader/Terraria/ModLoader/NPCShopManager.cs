@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Terraria.ID;
 using Terraria.Localization;
-using Terraria.ModLoader.Default;
 
 namespace Terraria.ModLoader
 {
 	public static partial class NPCShopManager
 	{
 		internal static Dictionary<int, NPCShop> shops = new Dictionary<int, NPCShop>();
+		internal static Dictionary<int, List<Item>> entryCache = new Dictionary<int, List<Item>>();
 
 		public static NPCShop GetShop(int type) => shops.ContainsKey(type) ? shops[type] : null;
 
@@ -20,12 +19,13 @@ namespace Terraria.ModLoader
 
 		public static NPCShop RegisterShop(int npcType)
 		{
-			NPCShop shop = new NPCShop();
+			NPCShop shop = new NPCShop(npcType);
 			shops.Add(npcType, shop);
-			
+			entryCache.Add(npcType, new List<Item>());
+
 			return shop;
 		}
-		
+
 		internal static int ShopIDToNPCID(int type)
 		{
 			switch (type)
@@ -60,7 +60,6 @@ namespace Terraria.ModLoader
 
 		internal static void Initialize()
 		{
-			Stopwatch stopwatch = Stopwatch.StartNew();
 			SetupShop_Merchant();
 			SetupShop_ArmsDealer();
 			SetupShop_Dryad();
@@ -79,28 +78,19 @@ namespace Terraria.ModLoader
 			SetupShop_WitchDoctor();
 			SetupShop_Pirate();
 			SetupShop_Stylist();
-
-			NPCShop travellingMerchant = RegisterShop(NPCID.TravellingMerchant);
-			travellingMerchant.EvaluateOnOpen = false;
-			
-			travellingMerchant.CreateEntry(ItemID.Diamond).AddCondition(NetworkText.FromLiteral("pooo"), _ => Main.rand.NextBool(2));
-			
-			// todo: travelling merchant poop
-
+			SetupShop_TravellingMerchant();
 			SetupShop_SkeletonMerchant();
 			SetupShop_Bartender();
 			SetupShop_Golfer();
 			SetupShop_Zoologist();
 			SetupShop_Princess();
 			SetupShop_Pylons();
-			stopwatch.Stop();
-			
-			Logging.tML.Debug(stopwatch.Elapsed);
 		}
 
 		public static void Unload()
 		{
 			shops.Clear();
+			entryCache.Clear();
 		}
 	}
 }

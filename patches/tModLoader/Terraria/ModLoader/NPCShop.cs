@@ -1,18 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Terraria.Localization;
+using Entry = Terraria.ModLoader.NPCShop.Entry;
 
 namespace Terraria.ModLoader
 {
+	// todo: allow custom slot indexes, custom shops
+
+	
+
 	public partial class NPCShop
 	{
 		internal readonly Dictionary<string, Page> pages = new Dictionary<string, Page>();
 		public readonly Page DefaultPage;
+		private int type;
 
 		public bool EvaluateOnOpen = true;
 
-		public NPCShop()
+		internal NPCShop(int type)
 		{
+			this.type = type;
 			DefaultPage = new Page(NetworkText.FromLiteral("Default"));
 			pages.Add("Default", DefaultPage);
 		}
@@ -26,28 +33,23 @@ namespace Terraria.ModLoader
 
 		public Page GetPage(string key) => pages.ContainsKey(key) ? pages[key] : null;
 
-		public Entry CreateEntry(int type)
+		public EntryItem AddEntry(int type) => DefaultPage.AddEntry(type);
+
+		public EntryItem AddEntry<T>() where T : ModItem => AddEntry(ModContent.ItemType<T>());
+
+		public T AddEntry<T>(T entry) where T : Entry
 		{
-			Item item = new Item(type) { isAShopItem = true };
-			Entry entry = new Entry(item);
-			DefaultPage.entries.Add(entry);
+			DefaultPage.AddEntry(entry);
 			return entry;
 		}
 
-		public Entry CreateEntry<T>() where T : ModItem => CreateEntry(ModContent.ItemType<T>());
-
-		// note: move into manager
-		internal List<Item> items = new List<Item>();
-
 		internal void Evaluate()
 		{
-			items.Clear();
-			
-			foreach (Entry entry in pages.SelectMany(x => x.Value.entries))
-			{
-				if (entry.Conditions.Any(x => !x.ItemAvailable(entry))) continue;
+			NPCShopManager.entryCache[type].Clear();
 
-				items.Add(entry.item);
+			foreach (Entry entry in DefaultPage.entries)
+			{
+				NPCShopManager.entryCache[type].AddRange(entry.GetItems());
 			}
 		}
 	}

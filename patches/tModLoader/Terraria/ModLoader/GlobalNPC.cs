@@ -515,14 +515,6 @@ namespace Terraria.ModLoader
 		}
 
 		/// <summary>
-		/// Allows you to add items to the traveling merchant's shop. Add an item by setting shop[nextSlot] to the ID of the item you are adding then incrementing nextSlot. In the end, nextSlot must have a value of 1 greater than the highest index in shop that represents an item ID. If you want to remove an item, you will have to be familiar with programming.
-		/// </summary>
-		/// <param name="shop"></param>
-		/// <param name="nextSlot"></param>
-		public virtual void SetupTravelShop(int[] shop, ref int nextSlot) {
-		}
-
-		/// <summary>
 		/// Whether this NPC can be telported a King or Queen statue. Return true to allow the NPC to teleport to the statue, return false to block this NPC from teleporting to the statue, and return null to use the vanilla code for whether the NPC can teleport to the statue. Returns null by default.
 		/// </summary>
 		/// <param name="npc">The NPC</param>
