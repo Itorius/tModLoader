@@ -1,6 +1,7 @@
 --- src/Terraria/Terraria/Chest.cs
 +++ src/tModLoader/Terraria/Chest.cs
-@@ -1,5 +_,6 @@
+@@ -1,5 +_,7 @@
++using System;
  using Microsoft.Xna.Framework;
  using System.Collections.Generic;
 +using System.Linq;
@@ -129,7 +130,7 @@
  			}
  
  			item[num2] = newItem.Clone();
-@@ -528,6 +_,7 @@
+@@ -528,9 +_,14 @@
  			item[num2].stack -= num;
  			_ = item[num2].value;
  			_ = 0;
@@ -137,7 +138,14 @@
  		}
  
  		public static void SetupTravelShop() {
-@@ -874,12 +_,31 @@
++			NPCShop shop = NPCShopManager.GetShop(NPCID.TravellingMerchant);
++			shop.Evaluate();
++			
++			/*
+ 			for (int i = 0; i < 40; i++) {
+ 				Main.travelShop[i] = 0;
+ 			}
+@@ -874,12 +_,26 @@
  							Main.travelShop[num2++] = 3636;
  							Main.travelShop[num2++] = 3641;
  							break;
@@ -147,6 +155,7 @@
  			}
 +
 +			NPCLoader.SetupTravelShop(Main.travelShop, ref num2);
++			*/
  		}
  
  		public void SetupShop(int type) {
@@ -154,18 +163,20 @@
 +		
 +			for (int i = 0; i < 40; i++) item[i] = new Item();
 +
-+			NPCShop s = NPCShopManager.GetShop(type);
++			NPCShop shop = NPCShopManager.GetShop(type);
++			if (shop.EvaluateOnOpen) shop.Evaluate();
 +
-+			int nextSlot = 0;
-+			foreach (NPCShop.Entry entry in s.pages.SelectMany(x => x.Value.entries))
-+			{
-+				if (entry.Conditions.Any(x => !x.ItemAvailable(entry))) continue;
-+				
-+				item[nextSlot++] = entry.item;
-+			}
-+			
-+			return;
-+			
++			for (int i = 0; i < Math.Min(40, shop.items.Count); i++) item[i] = shop.items[i];
++
++			/*
  			bool flag = Main.LocalPlayer.currentShoppingSettings.PriceAdjustment <= 0.8500000238418579;
  			Item[] array = item;
  			for (int i = 0; i < 40; i++) {
+@@ -2556,6 +_,7 @@
+ 			for (int num12 = 0; num12 < num; num12++) {
+ 				array[num12].isAShopItem = true;
+ 			}
++			*/
+ 		}
+ 
+ 		private static bool BestiaryGirl_IsFairyTorchAvailable() {

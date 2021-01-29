@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Terraria.Localization;
 
 namespace Terraria.ModLoader
@@ -7,6 +8,8 @@ namespace Terraria.ModLoader
 	{
 		internal readonly Dictionary<string, Page> pages = new Dictionary<string, Page>();
 		public readonly Page DefaultPage;
+
+		public bool EvaluateOnOpen = true;
 
 		public NPCShop()
 		{
@@ -30,7 +33,22 @@ namespace Terraria.ModLoader
 			DefaultPage.entries.Add(entry);
 			return entry;
 		}
-		
-		public Entry CreateEntry<T>() where T: ModItem => CreateEntry(ModContent.ItemType<T>());
+
+		public Entry CreateEntry<T>() where T : ModItem => CreateEntry(ModContent.ItemType<T>());
+
+		// note: move into manager
+		internal List<Item> items = new List<Item>();
+
+		internal void Evaluate()
+		{
+			items.Clear();
+			
+			foreach (Entry entry in pages.SelectMany(x => x.Value.entries))
+			{
+				if (entry.Conditions.Any(x => !x.ItemAvailable(entry))) continue;
+
+				items.Add(entry.item);
+			}
+		}
 	}
 }

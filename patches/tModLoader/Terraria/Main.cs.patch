@@ -815,8 +815,12 @@
  #if SERVER
  			netMode = 2;
  #endif
-@@ -4974,7 +_,7 @@
- 			Chest.SetupTravelShop();
+@@ -4971,10 +_,10 @@
+ 			}
+ 
+ 			shop[0] = new Chest();
+-			Chest.SetupTravelShop();
++			// Chest.SetupTravelShop();
  			for (int m = 1; m < 100; m++) {
  				shop[m] = new Chest();
 -				shop[m].SetupShop(m);
