@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria.Localization;
@@ -43,6 +44,11 @@ namespace Terraria.ModLoader
 				this.item = item;
 			}
 
+			public EntryItem(int type)
+			{
+				item = new Item(type) { isAShopItem = true };
+			}
+
 			public EntryItem SetCurrency(int currencyID)
 			{
 				item.shopSpecialCurrency = currencyID;
@@ -65,16 +71,22 @@ namespace Terraria.ModLoader
 		/// <summary>
 		/// Returns all entries that satisfy their conditions
 		/// </summary>
-		public class EntryList : Entry
+		public class EntryList : Entry, IEnumerable<Entry>
 		{
 			protected readonly List<Entry> entries = new List<Entry>();
 
+			public void Add(Entry entry)
+			{
+				entries.Add(entry);
+			}
+
 			public override IEnumerable<Item> GetItems(bool checkRequirements = true)
 			{
+				if (checkRequirements && !ConditionsMet) return Enumerable.Empty<Item>();
 				return entries.SelectMany(entry => entry.GetItems(checkRequirements));
 			}
 
-			public EntryItem AddEntry(int type)
+			public EntryItem CreateEntry(int type)
 			{
 				Item item = new Item(type) { isAShopItem = true };
 				EntryItem entry = new EntryItem(item);
@@ -82,13 +94,17 @@ namespace Terraria.ModLoader
 				return entry;
 			}
 
-			public EntryItem AddEntry<T>() where T : ModItem => AddEntry(ModContent.ItemType<T>());
+			public EntryItem CreateEntry<T>() where T : ModItem => CreateEntry(ModContent.ItemType<T>());
 
 			public T AddEntry<T>(T entry) where T : Entry
 			{
 				entries.Add(entry);
 				return entry;
 			}
+
+			public IEnumerator<Entry> GetEnumerator() => entries.GetEnumerator();
+
+			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
 
 		/// <summary>
@@ -98,6 +114,7 @@ namespace Terraria.ModLoader
 		{
 			public override IEnumerable<Item> GetItems(bool checkRequirements = true)
 			{
+				if (checkRequirements && !ConditionsMet) return Enumerable.Empty<Item>();
 				return entries[Main.rand.Next(entries.Count)].GetItems(checkRequirements);
 			}
 		}
