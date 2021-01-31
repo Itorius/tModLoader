@@ -168,6 +168,10 @@ namespace Terraria.ModLoader
 				public static readonly Condition OrbSmashed = new SimpleCondition(NetworkText.FromKey("ShopConditions.OrbSmashed"), () => WorldGen.shadowOrbSmashed);
 				public static Condition HasItem(int type) => new SimpleCondition(NetworkText.FromKey("ShopConditions.HasItem"), () => Main.LocalPlayer.HasItem(type));
 				public static Condition NPCExists(int type) => new SimpleCondition(NetworkText.FromKey("ShopConditions.NPCExists"), () => NPC.AnyNPCs(type));
+				public static Condition GolfScore(int value) => new SimpleCondition(NetworkText.FromKey("ShopConditions.GolfScore"), () => Main.LocalPlayer.golferScoreAccumulated > value);
+				
+				public static Condition BestiaryCompletion(float value) => new SimpleCondition(NetworkText.FromLiteral("ShopConditions.BestiaryCompletion"), () => Main.GetBestiaryProgressReport().CompletionPercent >= value);
+
 				#endregion
 
 				private readonly NetworkText DescriptionText;
@@ -180,6 +184,8 @@ namespace Terraria.ModLoader
 				}
 
 				public abstract bool Evaluate();
+
+				public virtual void SetCustomData(object obj){}
 			}
 
 			public class SimpleCondition : Condition

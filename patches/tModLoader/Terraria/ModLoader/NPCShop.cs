@@ -1,14 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Terraria.Localization;
-using Entry = Terraria.ModLoader.NPCShop.Entry;
 
 namespace Terraria.ModLoader
 {
 	// todo: allow custom slot indexes, custom shops
-
-	
-
 	public partial class NPCShop
 	{
 		internal readonly Dictionary<string, Page> pages = new Dictionary<string, Page>();
@@ -33,9 +28,9 @@ namespace Terraria.ModLoader
 
 		public Page GetPage(string key) => pages.ContainsKey(key) ? pages[key] : null;
 
-		public EntryItem AddEntry(int type) => DefaultPage.AddEntry(type);
+		public EntryItem CreateEntry(int type) => DefaultPage.AddEntry(type);
 
-		public EntryItem AddEntry<T>() where T : ModItem => AddEntry(ModContent.ItemType<T>());
+		public EntryItem CreateEntry<T>() where T : ModItem => CreateEntry(ModContent.ItemType<T>());
 
 		public T AddEntry<T>(T entry) where T : Entry
 		{
@@ -47,10 +42,12 @@ namespace Terraria.ModLoader
 		{
 			NPCShopManager.entryCache[type].Clear();
 
-			foreach (Entry entry in DefaultPage.entries)
-			{
-				NPCShopManager.entryCache[type].AddRange(entry.GetItems());
-			}
+			foreach (Entry entry in DefaultPage.entries) NPCShopManager.entryCache[type].AddRange(entry.GetItems());
+		}
+
+		public virtual void Draw()
+		{
+			
 		}
 	}
 }
