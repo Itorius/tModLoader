@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Terraria.ID;
 using Terraria.Localization;
 
@@ -85,6 +87,21 @@ namespace Terraria.ModLoader
 			SetupShop_Zoologist();
 			SetupShop_Princess();
 			SetupShop_Pylons();
+
+			// foreach (KeyValuePair<int,NPCShop> pair in shops)
+			// {
+			// 	Logging.tML.Debug(Lang.GetNPCNameValue(pair.Key));
+			// 	
+			// 	foreach (NPCShop.Entry entry in pair.Value.pages.SelectMany(x=>x.Value.entries))
+			// 	{
+			// 		Logging.tML.Debug("\t"+entry.GetItems(false).Select(x=>x.HoverName).Aggregate((x,y)=>x + ", "+y));
+			//
+			// 		foreach (NPCShop.Entry.Condition condition in entry.Conditions)
+			// 		{
+			// 			Logging.tML.Debug("\t\t" + condition.Description);
+			// 		}
+			// 	}
+			// }
 		}
 
 		public static void Unload()

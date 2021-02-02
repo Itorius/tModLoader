@@ -747,8 +747,8 @@ namespace Terraria.ModLoader
 
 			armsDealer.CreateEntry(97);
 
-			armsDealer.CreateEntry(4915).AddCondition((Condition.BloodMoon | Condition.Hardmode) & new NPCShop.Entry.SimpleCondition(NetworkText.FromLiteral("silver"), ()=> WorldGen.SavedOreTiers.Silver == 168));
-			armsDealer.CreateEntry(278).AddCondition((Condition.BloodMoon | Condition.Hardmode) & new NPCShop.Entry.SimpleCondition(NetworkText.FromLiteral("notsilver"), ()=> WorldGen.SavedOreTiers.Silver != 168));
+			armsDealer.CreateEntry(4915).AddCondition(Condition.Hardmode | (Condition.BloodMoon & new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("WorldSilverOre"), ()=> WorldGen.SavedOreTiers.Silver == 168)));
+			armsDealer.CreateEntry(278).AddCondition(Condition.Hardmode | (Condition.BloodMoon & new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("WorldTungstenOre"), ()=> WorldGen.SavedOreTiers.Silver != 168)));
 			armsDealer.CreateEntry(47).AddCondition((Condition.DownedEvilBoss & Condition.TimeNight) | Condition.Hardmode);
 
 			armsDealer.CreateEntry(95);
@@ -851,9 +851,9 @@ namespace Terraria.ModLoader
 		private class LuckCondition : Condition
 		{
 			private int range;
-			public Player player;
+			private Player player;
 
-			public LuckCondition(int range) : base(NetworkText.FromLiteral("Luck"))
+			public LuckCondition(int range) : base(NetworkText.FromKey("ShopConditions.PlayerLuck"))
 			{
 				this.range = range;
 			}
@@ -1042,26 +1042,26 @@ namespace Terraria.ModLoader
 				if (pair.Key == NPCID.TravellingMerchant || pair.Key == NPCID.SkeletonMerchant || Main.LocalPlayer.currentShoppingSettings.PriceAdjustment > 0.8500000238418579) continue;
 				if (Main.LocalPlayer.ZoneCrimson || Main.LocalPlayer.ZoneCorrupt) continue;
 
-					pair.Value.CreateEntry(4876).AddCondition(
+				pair.Value.CreateEntry(4876).AddCondition(
+					!Condition.InSnow, !Condition.InDesert, !Condition.InBeach, !Condition.InJungle, !Condition.Halloween, !Condition.InGlowshroom,
+					new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("ShopConditions.PlayerPosY"), ()=>  Main.LocalPlayer.position.Y < Main.worldSurface * 16.0));;
+
+				pair.Value.CreateEntry(4920).AddCondition(Condition.InSnow);
+
+				pair.Value.CreateEntry(4919).AddCondition(Condition.InDesert);
+
+				pair.Value.CreateEntry(4917)
+					.AddCondition(
 						!Condition.InSnow, !Condition.InDesert, !Condition.InBeach, !Condition.InJungle, !Condition.Halloween, !Condition.InGlowshroom,
-						new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("ShopConditions.PlayerPosY"), ()=>  Main.LocalPlayer.position.Y < Main.worldSurface * 16.0));;
+						new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("ShopConditions.PlayerPosY"), ()=>  Main.LocalPlayer.position.Y >= Main.worldSurface * 16.0));
 
-					pair.Value.CreateEntry(4920).AddCondition(Condition.InSnow);
+				pair.Value.CreateEntry(4918).AddCondition(Condition.InBeach, new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("ShopConditions.PlayerPosY"), ()=>  Main.LocalPlayer.position.Y < Main.worldSurface * 16.0));
 
-					pair.Value.CreateEntry(4919).AddCondition(Condition.InDesert);
+				pair.Value.CreateEntry(4875).AddCondition(Condition.InJungle);
 
-					pair.Value.CreateEntry(4917)
-						.AddCondition(
-							!Condition.InSnow, !Condition.InDesert, !Condition.InBeach, !Condition.InJungle, !Condition.Halloween, !Condition.InGlowshroom,
-							new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("ShopConditions.PlayerPosY"), ()=>  Main.LocalPlayer.position.Y >= Main.worldSurface * 16.0));
+				pair.Value.CreateEntry(4916).AddCondition(Condition.InHallow);
 
-					pair.Value.CreateEntry(4918).AddCondition(Condition.InBeach, new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("ShopConditions.PlayerPosY"), ()=>  Main.LocalPlayer.position.Y < Main.worldSurface * 16.0));
-
-					pair.Value.CreateEntry(4875).AddCondition(Condition.InJungle);
-
-					pair.Value.CreateEntry(4916).AddCondition(Condition.InHallow);
-
-					pair.Value.CreateEntry(4921).AddCondition(Condition.InGlowshroom);
+				pair.Value.CreateEntry(4921).AddCondition(Condition.InGlowshroom);
 			}
 		}
 	}
