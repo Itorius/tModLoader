@@ -397,7 +397,7 @@ namespace Terraria.ModLoader
 
 		private static HookList HookModifyGlobalLoot = AddHook<Action<GlobalLoot>>(g => g.ModifyGlobalLoot);
 		public static void ModifyGlobalLoot(GlobalLoot globalLoot) {
-			foreach (GlobalNPC g in HookModifyGlobalLoot.arr) {
+			foreach (GlobalNPC g in HookModifyGlobalLoot.Enumerate()) {
 				g.ModifyGlobalLoot(globalLoot);
 			}
 		}
@@ -915,7 +915,7 @@ namespace Terraria.ModLoader
 					Main.playerInventory = true;
 					Main.npcChatText = "";
 					Main.npcShop = Main.MaxShopIDs - 1;
-					Main.instance.shop[Main.npcShop].SetupShop(npc.type);
+					Chest.SetupShop(npc.type);
 				}
 			}
 

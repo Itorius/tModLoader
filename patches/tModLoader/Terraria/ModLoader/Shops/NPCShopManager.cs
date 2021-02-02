@@ -9,21 +9,17 @@ namespace Terraria.ModLoader
 	public static partial class NPCShopManager
 	{
 		internal static Dictionary<int, NPCShop> shops = new Dictionary<int, NPCShop>();
-		internal static Dictionary<int, List<Item>> entryCache = new Dictionary<int, List<Item>>();
+		internal static Dictionary<int, Item[]> entryCache = new Dictionary<int, Item[]>();
 
 		public static NPCShop GetShop(int type) => shops.ContainsKey(type) ? shops[type] : null;
 
-		public static NPCShop GetShop<T>() where T : ModNPC
-		{
-			int type = ModContent.NPCType<T>();
-			return shops.ContainsKey(type) ? shops[type] : null;
-		}
+		public static NPCShop GetShop<T>() where T : ModNPC => GetShop(ModContent.NPCType<T>());
 
 		public static NPCShop RegisterShop(int npcType)
 		{
 			NPCShop shop = new NPCShop(npcType);
 			shops.Add(npcType, shop);
-			entryCache.Add(npcType, new List<Item>());
+			entryCache.Add(npcType, new Item[0]);
 
 			return shop;
 		}

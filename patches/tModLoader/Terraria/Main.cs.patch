@@ -149,6 +149,19 @@
  		public static bool allChestStackHover;
  		public static bool inventorySortMouseOver;
  		public static float GraveyardVisualIntensity;
+@@ -1059,9 +_,9 @@
+ 		public static bool npcChatFocus4;
+ 		public static int oldNPCShop;
+ 		public static int npcChatCornerItem;
+-		public Chest[] shop = new Chest[100];
++		// public Chest[] shop = new Chest[100];
+-		public static ItemShopSellbackHelper shopSellbackHelper = new ItemShopSellbackHelper();
++		// public static ItemShopSellbackHelper shopSellbackHelper = new ItemShopSellbackHelper();
+-		public static int[] travelShop = new int[40];
++		// public static int[] travelShop = new int[40];
+ 		public static List<string> anglerWhoFinishedToday = new List<string>();
+ 		public static bool anglerQuestFinished;
+ 		public static int anglerQuest;
 @@ -1155,9 +_,9 @@
  		public static List<WorldFileData> WorldList = new List<WorldFileData>();
  		public static WorldFileData ActiveWorldFileData = new WorldFileData();
@@ -815,19 +828,25 @@
  #if SERVER
  			netMode = 2;
  #endif
-@@ -4971,10 +_,10 @@
+@@ -4970,12 +_,12 @@
+ 				liquidBuffer[l] = new LiquidBuffer();
  			}
  
- 			shop[0] = new Chest();
+-			shop[0] = new Chest();
++			// shop[0] = new Chest();
 -			Chest.SetupTravelShop();
 +			// Chest.SetupTravelShop();
- 			for (int m = 1; m < 100; m++) {
- 				shop[m] = new Chest();
+-			for (int m = 1; m < 100; m++) {
++			// for (int m = 1; m < 100; m++) {
+-				shop[m] = new Chest();
++				// shop[m] = new Chest();
 -				shop[m].SetupShop(m);
 +				// shop[m].SetupShop(m);
- 			}
+-			}
++			// }
  
  			teamColor[0] = Microsoft.Xna.Framework.Color.White;
+ 			teamColor[1] = new Microsoft.Xna.Framework.Color(218, 59, 59);
 @@ -5037,7 +_,7 @@
  			}
  
@@ -1270,6 +1289,15 @@
  			chatMonitor.Update();
  			upTimer = (float)sw.Elapsed.TotalMilliseconds;
  			if (upTimerMaxDelay > 0f)
+@@ -13253,7 +_,7 @@
+ 		private static void UpdateOldNPCShop() {
+ 			if (npcShop != oldNPCShop) {
+ 				oldNPCShop = npcShop;
+-				shopSellbackHelper.Clear();
++				// shopSellbackHelper.Clear();
+ 			}
+ 		}
+ 
 @@ -13375,7 +_,8 @@
  			if (!inputTextEnter || !chatRelease)
  				return;
@@ -1377,6 +1405,19 @@
  					CustomCurrencyManager.GetPriceText(hoverItem.shopSpecialCurrency, array, ref numLines, num5);
  					color = new Microsoft.Xna.Framework.Color((byte)(255f * num4), (byte)(255f * num4), (byte)(255f * num4), a);
  				}
+@@ -14851,9 +_,9 @@
+ 
+ 						int num11 = num10;
+ 						num10 *= hoverItem.stack;
+-						int amount = shopSellbackHelper.GetAmount(hoverItem);
++						// int amount = shopSellbackHelper.GetAmount(hoverItem);
+-						if (amount > 0)
++						// if (amount > 0)
+-							num10 += (-num11 + calcForBuying) * Math.Min(amount, hoverItem.stack);
++							// num10 += (-num11 + calcForBuying) * Math.Min(amount, hoverItem.stack);
+ 					}
+ 
+ 					if (num10 < 1)
 @@ -14894,6 +_,7 @@
  					else
  						array[numLines] = Lang.tip[50].Value + " " + text;
@@ -2448,6 +2489,15 @@
  				if (npc[player[myPlayer].talkNPC].type == 20) {
  					SoundEngine.PlaySound(12);
  					npcChatText = Lang.GetDryadWorldStatusDialog();
+@@ -29389,7 +_,7 @@
+ 			stackSplit = 9999;
+ 			npcChatText = "";
+ 			SetNPCShopIndex(shopIndex);
+-			shop[npcShop].SetupShop(npcShop);
++			Chest.SetupShop(npcShop);
+ 			SoundEngine.PlaySound(12);
+ 		}
+ 
 @@ -30058,7 +_,7 @@
  					num29++;
  
@@ -2555,6 +2605,64 @@
  						inventoryBack = color5;
  					}
  				}
+@@ -30751,31 +_,33 @@
+ 				SetNPCShopIndex(0);
+ 
+ 			if (npcShop > 0 && !recBigList) {
++				NPCShopManager.GetShop(NPCShopManager.ShopIDToNPCID(npcShop)).Draw(spriteBatch);
++				
+-				Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, Lang.inter[28].Value, 504f, invBottom, Microsoft.Xna.Framework.Color.White * ((float)(int)mouseTextColor / 255f), Microsoft.Xna.Framework.Color.Black, Vector2.Zero);
++				// Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, Lang.inter[28].Value, 504f, invBottom, Microsoft.Xna.Framework.Color.White * ((float)(int)mouseTextColor / 255f), Microsoft.Xna.Framework.Color.Black, Vector2.Zero);
+-				ItemSlot.DrawSavings(spriteBatch, 504f, invBottom);
++				// ItemSlot.DrawSavings(spriteBatch, 504f, invBottom);
+-				inventoryScale = 0.755f;
++				// inventoryScale = 0.755f;
+-				if (mouseX > 73 && mouseX < (int)(73f + 560f * inventoryScale) && mouseY > invBottom && mouseY < (int)((float)invBottom + 224f * inventoryScale) && !PlayerInput.IgnoreMouseInterface)
++				// if (mouseX > 73 && mouseX < (int)(73f + 560f * inventoryScale) && mouseY > invBottom && mouseY < (int)((float)invBottom + 224f * inventoryScale) && !PlayerInput.IgnoreMouseInterface)
+-					player[myPlayer].mouseInterface = true;
++				// 	player[myPlayer].mouseInterface = true;
+-
++				//
+-				for (int num104 = 0; num104 < 10; num104++) {
++				// for (int num104 = 0; num104 < 10; num104++) {
+-					for (int num105 = 0; num105 < 4; num105++) {
++				// 	for (int num105 = 0; num105 < 4; num105++) {
+-						int num106 = (int)(73f + (float)(num104 * 56) * inventoryScale);
++				// 		int num106 = (int)(73f + (float)(num104 * 56) * inventoryScale);
+-						int num107 = (int)((float)invBottom + (float)(num105 * 56) * inventoryScale);
++				// 		int num107 = (int)((float)invBottom + (float)(num105 * 56) * inventoryScale);
+-						int slot3 = num104 + num105 * 10;
++				// 		int slot3 = num104 + num105 * 10;
+-						new Microsoft.Xna.Framework.Color(100, 100, 100, 100);
++				// 		new Microsoft.Xna.Framework.Color(100, 100, 100, 100);
+-						if (mouseX >= num106 && (float)mouseX <= (float)num106 + (float)TextureAssets.InventoryBack.Width() * inventoryScale && mouseY >= num107 && (float)mouseY <= (float)num107 + (float)TextureAssets.InventoryBack.Height() * inventoryScale && !PlayerInput.IgnoreMouseInterface) {
++				// 		if (mouseX >= num106 && (float)mouseX <= (float)num106 + (float)TextureAssets.InventoryBack.Width() * inventoryScale && mouseY >= num107 && (float)mouseY <= (float)num107 + (float)TextureAssets.InventoryBack.Height() * inventoryScale && !PlayerInput.IgnoreMouseInterface) {
+-							ItemSlot.OverrideHover(shop[npcShop].item, 15, slot3);
++				// 			ItemSlot.OverrideHover(shop[npcShop].item, 15, slot3);
+-							player[myPlayer].mouseInterface = true;
++				// 			player[myPlayer].mouseInterface = true;
+-							ItemSlot.LeftClick(shop[npcShop].item, 15, slot3);
++				// 			ItemSlot.LeftClick(shop[npcShop].item, 15, slot3);
+-							ItemSlot.RightClick(shop[npcShop].item, 15, slot3);
++				// 			ItemSlot.RightClick(shop[npcShop].item, 15, slot3);
+-							ItemSlot.MouseHover(shop[npcShop].item, 15, slot3);
++				// 			ItemSlot.MouseHover(shop[npcShop].item, 15, slot3);
+-						}
++				// 		}
+-
++				//
+-						ItemSlot.Draw(spriteBatch, shop[npcShop].item, 15, slot3, new Vector2(num106, num107));
++				// 		ItemSlot.Draw(spriteBatch, shop[npcShop].item, 15, slot3, new Vector2(num106, num107));
+-					}
+-				}
++				// 	}
++				// }
+ 			}
+-
++			
+ 			if (player[myPlayer].chest > -1 && !tileContainer[tile[player[myPlayer].chestX, player[myPlayer].chestY].type]) {
+ 				player[myPlayer].chest = -1;
+ 				Recipe.FindRecipes();
 @@ -30975,7 +_,7 @@
  			else {
  				text = Lang.inter[21].Value + " " + guideItem.Name;

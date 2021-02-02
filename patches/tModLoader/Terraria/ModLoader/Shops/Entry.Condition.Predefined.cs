@@ -11,8 +11,7 @@ namespace Terraria.ModLoader
 		{
 			public abstract partial class Condition
 			{
-				private static Condition Construct(string key, Func<bool> predicate)
-				{
+				private static Condition Construct(string key, Func<bool> predicate) {
 					return new SimpleCondition(NetworkText.FromKey($"ShopConditions.{key}"), predicate);
 				}
 
@@ -40,14 +39,14 @@ namespace Terraria.ModLoader
 				public static readonly Condition DownedFrostLegion = Construct("DownedFrostLegion", () => NPC.downedFrost);
 
 				// Moon Phase
-				public static readonly Condition PhaseFull = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseFullMoon"), () => Main.GetMoonPhase() == MoonPhase.Full);
-				public static readonly Condition PhaseThreeQuartersAtLeft = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseWaningGibbous"), () => Main.GetMoonPhase() == MoonPhase.ThreeQuartersAtLeft);
-				public static readonly Condition PhaseHalfAtLeft = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseThirdQuarter"), () => Main.GetMoonPhase() == MoonPhase.HalfAtLeft);
-				public static readonly Condition PhaseQuarterAtLeft = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseWaningCrescent"), () => Main.GetMoonPhase() == MoonPhase.QuarterAtLeft);
-				public static readonly Condition PhaseEmpty = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseNewMoon"), () => Main.GetMoonPhase() == MoonPhase.Empty);
-				public static readonly Condition PhaseQuarterAtRight = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseWaxingCrescent"), () => Main.GetMoonPhase() == MoonPhase.QuarterAtRight);
-				public static readonly Condition PhaseHalfAtRight = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseFirstQuarter"), () => Main.GetMoonPhase() == MoonPhase.HalfAtRight);
-				public static readonly Condition PhaseThreeQuartersAtRight = new SimpleCondition(NetworkText.FromKey("ShopConditions.PhaseWaxingGibbous"), () => Main.GetMoonPhase() == MoonPhase.ThreeQuartersAtRight);
+				public static readonly Condition PhaseFull = Construct("PhaseFullMoon", () => Main.GetMoonPhase() == MoonPhase.Full);
+				public static readonly Condition PhaseThreeQuartersAtLeft = Construct("PhaseWaningGibbous", () => Main.GetMoonPhase() == MoonPhase.ThreeQuartersAtLeft);
+				public static readonly Condition PhaseHalfAtLeft = Construct("PhaseThirdQuarter", () => Main.GetMoonPhase() == MoonPhase.HalfAtLeft);
+				public static readonly Condition PhaseQuarterAtLeft = Construct("PhaseWaningCrescent", () => Main.GetMoonPhase() == MoonPhase.QuarterAtLeft);
+				public static readonly Condition PhaseEmpty = Construct("PhaseNewMoon", () => Main.GetMoonPhase() == MoonPhase.Empty);
+				public static readonly Condition PhaseQuarterAtRight = Construct("PhaseWaxingCrescent", () => Main.GetMoonPhase() == MoonPhase.QuarterAtRight);
+				public static readonly Condition PhaseHalfAtRight = Construct("PhaseFirstQuarter", () => Main.GetMoonPhase() == MoonPhase.HalfAtRight);
+				public static readonly Condition PhaseThreeQuartersAtRight = Construct("PhaseWaxingGibbous", () => Main.GetMoonPhase() == MoonPhase.ThreeQuartersAtRight);
 
 				// Boss				
 				public static readonly Condition DownedKingSlime = Construct("DownedKingSlime", () => NPC.downedSlimeKing);
@@ -107,6 +106,7 @@ namespace Terraria.ModLoader
 				public static readonly Condition InLihzhardTemple = Construct("InLihzhardTemple", () => Main.LocalPlayer.ZoneLihzhardTemple);
 				public static readonly Condition InGraveyardBiome = Construct("InGraveyardBiome", () => Main.LocalPlayer.ZoneGraveyard);
 				public static readonly Condition InSpace = Construct("InSpace", () => Main.LocalPlayer.position.Y / 16f < Main.worldSurface * 0.3499999940395355);
+
 				public static readonly Condition InOcean = Construct("InOcean", () => {
 					int x = (int)((Main.screenPosition.X + Main.screenWidth * 0.5f) / 16f);
 					return Main.screenPosition.Y / 16f < Main.worldSurface + 10.0 && (x < 380 || x > Main.maxTilesX - 380);

@@ -107,12 +107,14 @@
  		}
  
 -		public void AddItemToShop(Item newItem) {
-+		public int AddItemToShop(Item newItem) { //tML: Now returns the item's index.
- 			int num = Main.shopSellbackHelper.Remove(newItem);
-+			
- 			if (num >= newItem.stack)
+-			int num = Main.shopSellbackHelper.Remove(newItem);
+-			if (num >= newItem.stack)
 -				return;
-+				return 0;
++		public int AddItemToShop(Item newItem) { //tML: Now returns the item's index.
++			// int num = Main.shopSellbackHelper.Remove(newItem);
++			
++			// if (num >= newItem.stack)
++				// return 0;
  
  			int num2 = 0;
  			while (true) {
@@ -121,7 +123,7 @@
  					if (item[num2] == null || item[num2].type == 0)
  						break;
  
-@@ -519,7 +_,7 @@
+@@ -519,18 +_,23 @@
  					continue;
  				}
  
@@ -130,8 +132,10 @@
  			}
  
  			item[num2] = newItem.Clone();
-@@ -528,9 +_,14 @@
- 			item[num2].stack -= num;
+ 			item[num2].favorited = false;
+ 			item[num2].buyOnce = true;
+-			item[num2].stack -= num;
++			// item[num2].stack -= num;
  			_ = item[num2].value;
  			_ = 0;
 +			return num2;
@@ -145,7 +149,7 @@
  			for (int i = 0; i < 40; i++) {
  				Main.travelShop[i] = 0;
  			}
-@@ -874,12 +_,26 @@
+@@ -874,12 +_,21 @@
  							Main.travelShop[num2++] = 3636;
  							Main.travelShop[num2++] = 3641;
  							break;
@@ -158,15 +162,11 @@
 +			*/
  		}
  
- 		public void SetupShop(int type) {
+-		public void SetupShop(int type) {
++		public static void SetupShop(int type) {
 +			type = NPCShopManager.ShopIDToNPCID(type);
-+		
-+			for (int i = 0; i < 40; i++) item[i] = new Item();
-+
 +			NPCShop shop = NPCShopManager.GetShop(type);
-+			if (shop.EvaluateOnOpen) shop.Evaluate();
-+
-+			for (int i = 0; i < Math.Min(40, NPCShopManager.entryCache[type].Count); i++) item[i] = NPCShopManager.entryCache[type][i];
++			shop.Open();
 +
 +			/*
  			bool flag = Main.LocalPlayer.currentShoppingSettings.PriceAdjustment <= 0.8500000238418579;
