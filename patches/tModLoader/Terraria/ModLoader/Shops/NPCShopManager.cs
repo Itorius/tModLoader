@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria.ID;
 using Terraria.Localization;
@@ -60,12 +62,101 @@ namespace Terraria.ModLoader
 		}
 	}
 
+	public class CacheList : IEnumerable<Item>
+	{
+		private Item[] data;
+		public int Count { get; private set; }
+		public int Capacity { get; private set; }
+
+		public CacheList(int size = 40) {
+			Capacity = size;
+
+			data = new Item[size];
+			for (int i = 0; i < size; i++)
+			{
+				data[i] = new Item();
+			}
+		}
+
+		public void Clear() {
+			data = new Item[40];
+			Count = 0;
+			Capacity = 40;
+
+			for (int i = 0; i < 40; i++)
+			{
+				data[i] = new Item();
+			}
+		}
+
+		public int Add(Item item) {
+			Count++;
+
+			int nextEmpty = -1;
+			for (int i = 0; i < data.Length; i++)
+			{
+				if (data[i].IsAir)
+				{
+					nextEmpty = i;
+					break;
+				}
+			}
+
+			if (nextEmpty == -1)
+			{
+				Capacity += 10;
+				nextEmpty = data.Length;
+
+				Array.Resize(ref data, data.Length + 10);
+
+				for (int i = data.Length - 10; i < data.Length; i++)
+					data[i] = new Item();
+			}
+
+			data[nextEmpty] = item;
+			return nextEmpty;
+		}
+
+		public void Remove(int index) {
+			data[index] = new Item();
+			Count--;
+		}
+		
+		public void RemoveEmptyRows() {
+			for (int i = data.Length / 10 - 1; i >= 0; i--)
+			{
+				for (int j = i * 10; j < i * 10 + 10; j++)
+				{
+					if (!data[j].IsAir) return;
+				}
+				
+				Array.Resize(ref data, data.Length - 10);
+				Capacity -= 10;
+			}
+		}
+
+		public IEnumerator<Item> GetEnumerator() => (IEnumerator<Item>)data.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+		public Item this[int index] {
+			get => data[index];
+			set => data[index] = value;
+		}
+
+		public void AddRange(IEnumerable<Item> items) {
+			foreach (Item item in items)
+			{
+				Add(item);
+			}
+		}
+	}
+
 	public static class NPCShopManager
 	{
 		internal static List<NPCShop> shops = new List<NPCShop>();
-		
-		// note: covert to array afterall?
-		internal static Dictionary<int, Dictionary<string, List<Item>>> entryCache = new Dictionary<int, Dictionary<string, List<Item>>>();
+
+		internal static Dictionary<int, Dictionary<string, CacheList>> entryCache = new Dictionary<int, Dictionary<string, CacheList>>();
 
 		internal static int NextTypeID;
 
@@ -77,7 +168,7 @@ namespace Terraria.ModLoader
 			shop.Type = NextTypeID++;
 			shops.Add(shop);
 
-			entryCache.Add(shop.Type, new Dictionary<string, List<Item>>());
+			entryCache.Add(shop.Type, new Dictionary<string, CacheList>());
 		}
 
 		public static NPCShop GetShop<T>() where T : NPCShop => GetShop(ShopType<T>());

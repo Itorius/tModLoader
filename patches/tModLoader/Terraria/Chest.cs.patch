@@ -2172,7 +2172,7 @@
 +		public static void SetupShop(int type) {
 +			type = NPCShopManager.ShopIDToNPCID(type);
 +			NPCShop shop = NPCShopManager.GetShop(type);
-+			shop.Open();
++			shop.OnOpen();
  		}
  
  		private static bool BestiaryGirl_IsFairyTorchAvailable() {

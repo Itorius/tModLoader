@@ -41,7 +41,7 @@ namespace Terraria.ModLoader
 			Tab tab = new Tab(name) { Name = key };
 			tabs.Add(key, tab);
 
-			NPCShopManager.entryCache[Type].Add(key, new List<Item>());
+			NPCShopManager.entryCache[Type].Add(key, new CacheList());
 
 			return tab;
 		}
@@ -62,23 +62,11 @@ namespace Terraria.ModLoader
 			clone.favorited = false;
 			clone.buyOnce = true;
 
-			int rows = Math.Max(4, (int)Math.Ceiling(NPCShopManager.entryCache[Type][currentTab.Name].Count / 10f));
-			int maxRowIndex = rows - 4;
+			var cache = NPCShopManager.entryCache[Type][currentTab.Name];
+			int index = cache.Add(clone);
 
-			int index = NPCShopManager.entryCache[Type][currentTab.Name].FindIndex(x => x.IsAir);
-			if (index != -1)
-			{
-				NPCShopManager.entryCache[Type][currentTab.Name][index] = clone;
-				npcShopRowIndex = Math.Min(maxRowIndex, index / 10);
-
-				return index;
-			}
-
-			NPCShopManager.entryCache[Type][currentTab.Name].Add(clone);
-			index = NPCShopManager.entryCache[Type][currentTab.Name].Count - 1;
-
-			npcShopRowIndex = maxRowIndex;
-			if (index % 10 == 0) npcShopRowIndex++;
+			int maxRowIndex = cache.Capacity / 10 - 4;
+			npcShopRowIndex = Math.Min(maxRowIndex, index / 10);
 
 			return index;
 		}
@@ -104,6 +92,11 @@ namespace Terraria.ModLoader
 
 		private static int npcShopRowIndex;
 		internal static Tab currentTab;
+		private static Dictionary<string, CacheList> temp;
+
+		public void OnClose() {
+			NPCShopManager.entryCache[Type] = temp;
+		}
 
 		public virtual Rectangle GetDimensions() {
 			return new Rectangle(73, Main.instance.invBottom, (int)(560 * 0.755f), (int)(224 * 0.755f));
@@ -111,9 +104,9 @@ namespace Terraria.ModLoader
 
 		public virtual void OnScroll(int delta) {
 			var inv = NPCShopManager.entryCache[Type][currentTab.Name];
-			int rows = Math.Max(4, (int)Math.Ceiling(inv.Count / 10f));
+			int rows = Math.Max(4, inv.Capacity / 10);
 			int maxRowIndex = rows - 4;
-			
+
 			npcShopRowIndex = Utils.Clamp(npcShopRowIndex + delta, 0, maxRowIndex);
 
 			if (!PlayerInput.IgnoreMouseInterface)
@@ -121,12 +114,14 @@ namespace Terraria.ModLoader
 				Main.LocalPlayer.mouseInterface = true;
 			}
 		}
-		
-		public virtual void Open() {
+
+		public virtual void OnOpen() {
 			npcShopRowIndex = 0;
 			currentTab = DefaultTab;
 
 			if (EvaluateOnOpen) Evaluate();
+
+			temp = new Dictionary<string, CacheList>(NPCShopManager.entryCache[Type]);
 		}
 
 		public virtual void Draw(SpriteBatch spriteBatch) {
@@ -138,9 +133,9 @@ namespace Terraria.ModLoader
 			Vector2 slotSize = TextureAssets.InventoryBack.Size() * inventoryScale;
 			int invBottom = Main.instance.invBottom;
 			var inv = NPCShopManager.entryCache[Type][currentTab.Name];
-			int rows = Math.Max(4, (int)Math.Ceiling(inv.Count / 10f));
+			int rows = Math.Max(4, inv.Capacity / 10);
 
-			Rectangle shopRect = new Rectangle(73, invBottom, (int)(560 * inventoryScale), (int)(224 * inventoryScale));
+			Rectangle shopRect = GetDimensions();
 
 			Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, Language.GetText("LegacyInterface.28").Value, 504f, invBottom, Color.White * (Main.mouseTextColor / 255f), Color.Black, Vector2.Zero);
 			ItemSlot.DrawSavings(spriteBatch, 504f, invBottom);
@@ -161,7 +156,7 @@ namespace Terraria.ModLoader
 					int y = (int)(invBottom + (row - npcShopRowIndex) * 56 * inventoryScale);
 					int slotIndex = column + row * 10;
 
-					Item item = slotIndex < inv.Count ? inv[slotIndex] : new Item();
+					Item item = inv[slotIndex];
 
 					if (mouseX >= x && mouseX <= x + slotSize.X && mouseY >= y && mouseY <= y + slotSize.Y && !PlayerInput.IgnoreMouseInterface)
 					{
@@ -174,10 +169,14 @@ namespace Terraria.ModLoader
 
 					ItemSlot.Draw(spriteBatch, ref item, 15, new Vector2(x, y));
 
-					// todo: fix this
-					// inv[slotIndex] = item;
+					if (item.IsAir && !inv[slotIndex].IsAir) inv.Remove(slotIndex);
+					else inv[slotIndex] = item;
 				}
 			}
+
+			inv.RemoveEmptyRows();
+			int maxRowIndex = inv.Capacity / 10 - 4;
+			npcShopRowIndex = Math.Min(npcShopRowIndex, maxRowIndex);
 		}
 	}
 }

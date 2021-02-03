@@ -2489,13 +2489,20 @@
  				if (npc[player[myPlayer].talkNPC].type == 20) {
  					SoundEngine.PlaySound(12);
  					npcChatText = Lang.GetDryadWorldStatusDialog();
-@@ -29389,7 +_,7 @@
+@@ -29389,11 +_,14 @@
  			stackSplit = 9999;
  			npcChatText = "";
  			SetNPCShopIndex(shopIndex);
 -			shop[npcShop].SetupShop(npcShop);
 +			Chest.SetupShop(npcShop);
  			SoundEngine.PlaySound(12);
+ 		}
+ 
+ 		public static void SetNPCShopIndex(int index) {
++			if (index == 0 && NPCShopManager.CurrentShop != null)
++				NPCShopManager.CurrentShop.OnClose();
++				
+ 			npcShop = index;
  		}
  
 @@ -30058,7 +_,7 @@
