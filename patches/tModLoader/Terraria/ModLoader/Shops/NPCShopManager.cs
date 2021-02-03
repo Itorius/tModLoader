@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Terraria.ID;
-using Terraria.Localization;
 
 namespace Terraria.ModLoader
 {
@@ -15,17 +12,16 @@ namespace Terraria.ModLoader
 
 		public static NPCShop GetShop<T>() where T : ModNPC => GetShop(ModContent.NPCType<T>());
 
-		public static NPCShop RegisterShop(int npcType)
-		{
-			NPCShop shop = new NPCShop(npcType);
+		public static NPCShop RegisterShop(int npcType) {
+			NPCShop shop = new NPCShop { Type = npcType };
+
 			shops.Add(npcType, shop);
 			entryCache.Add(npcType, new Item[0]);
 
 			return shop;
 		}
 
-		internal static int ShopIDToNPCID(int type)
-		{
+		internal static int ShopIDToNPCID(int type) {
 			switch (type)
 			{
 				case 1: return NPCID.Merchant;
@@ -56,8 +52,7 @@ namespace Terraria.ModLoader
 			}
 		}
 
-		internal static void Initialize()
-		{
+		internal static void Initialize() {
 			SetupShop_Merchant();
 			SetupShop_ArmsDealer();
 			SetupShop_Dryad();
@@ -84,6 +79,13 @@ namespace Terraria.ModLoader
 			SetupShop_Princess();
 			SetupShop_Pylons();
 
+			NPCShop shop = GetShop(NPCID.Merchant);
+
+			for (int i = 0; i < 50; i++)
+			{
+				shop.CreateEntry(ItemID.DirtBlock);
+			}
+
 			// foreach (KeyValuePair<int,NPCShop> pair in shops)
 			// {
 			// 	Logging.tML.Debug(Lang.GetNPCNameValue(pair.Key));
@@ -100,8 +102,7 @@ namespace Terraria.ModLoader
 			// }
 		}
 
-		public static void Unload()
-		{
+		public static void Unload() {
 			shops.Clear();
 			entryCache.Clear();
 		}

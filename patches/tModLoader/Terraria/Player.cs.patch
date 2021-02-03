@@ -2514,7 +2514,7 @@
  			luck = GetLadyBugLuck() * 0.2f + torchLuck * 0.2f;
  			luck += (float)(int)luckPotion * 0.1f;
  			if (LanternNight.LanternsUp)
-@@ -19774,6 +_,9 @@
+@@ -19774,9 +_,12 @@
  
  			if (HasGardenGnomeNearby)
  				luck += 0.2f;
@@ -2523,7 +2523,11 @@
 +			PlayerHooks.ModifyLuck(this, ref luck);
  		}
  
- 		private static int GetMouseScrollDelta() => PlayerInput.ScrollWheelDelta / 120;
+-		private static int GetMouseScrollDelta() => PlayerInput.ScrollWheelDelta / 120;
++		internal static int GetMouseScrollDelta() => PlayerInput.ScrollWheelDelta / 120;
+ 
+ 		private void UpdatePortableStoolUsage() {
+ 			bool flag = portableStoolInfo.HasAStool && controlUp && !gravControl && !mount.Active && velocity.X == 0f && velocity.Y == 0f && !pulley && grappling[0] == -1;
 @@ -19872,6 +_,8 @@
  
  			if (wingsLogic == 45 && (float)timeSinceLastDashStarted >= 60f)

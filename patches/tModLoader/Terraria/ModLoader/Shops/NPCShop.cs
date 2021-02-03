@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameInput;
-using Terraria.ID;
 using Terraria.Localization;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -16,45 +13,47 @@ namespace Terraria.ModLoader
 	// todo: allow custom slot indexes, custom shops
 	public partial class NPCShop
 	{
-		internal readonly Dictionary<string, Page> pages = new Dictionary<string, Page>();
-		public readonly Page DefaultPage;
-		private int type;
+		public int Type { get; internal set; }
+
+		internal readonly Dictionary<string, Tab> tabs = new Dictionary<string, Tab>();
+		public readonly Tab DefaultTab;
 
 		public bool EvaluateOnOpen = true;
 
-		internal NPCShop(int type) {
-			this.type = type;
-			DefaultPage = new Page(NetworkText.FromLiteral("Default"));
-			pages.Add("Default", DefaultPage);
+		internal NPCShop() {
+			DefaultTab = new Tab(NetworkText.FromLiteral("Default"));
+			tabs.Add("Default", DefaultTab);
 		}
 
-		public Page AddPage(string key, NetworkText name) {
-			Page page = new Page(name);
-			pages.Add(key, page);
-			return page;
+		public Tab AddPage(string key, NetworkText name) {
+			Tab tab = new Tab(name);
+			tabs.Add(key, tab);
+			return tab;
 		}
 
-		public Page GetPage(string key) => pages.ContainsKey(key) ? pages[key] : null;
+		public Tab GetPage(string key) => tabs.ContainsKey(key) ? tabs[key] : null;
 
-		public EntryItem CreateEntry(int type) => DefaultPage.AddEntry(type);
+		public EntryItem CreateEntry(int type) => DefaultTab.AddEntry(type);
 
 		public EntryItem CreateEntry<T>() where T : ModItem => CreateEntry(ModContent.ItemType<T>());
 
 		public T AddEntry<T>(T entry) where T : Entry {
-			DefaultPage.AddEntry(entry);
+			DefaultTab.AddEntry(entry);
 			return entry;
 		}
 
-		internal void Evaluate() {
+		public virtual void Evaluate() {
+			// this sucks
+			
 			List<Item> l = new List<Item>();
-			foreach (Entry entry in DefaultPage.entries) l.AddRange(entry.GetItems());
+			foreach (Entry entry in DefaultTab.entries) l.AddRange(entry.GetItems());
 
 			int size = Math.Max(40, (l.Count / 10 + 1) * 10);
-			NPCShopManager.entryCache[type] = new Item[size];
+			NPCShopManager.entryCache[Type] = new Item[size];
 			for (int i = 0; i < size; i++)
 			{
-				if (i < l.Count) NPCShopManager.entryCache[type][i] = l[i];
-				else NPCShopManager.entryCache[type][i] = new Item();
+				if (i < l.Count) NPCShopManager.entryCache[Type][i] = l[i];
+				else NPCShopManager.entryCache[Type][i] = new Item();
 			}
 		}
 
@@ -64,72 +63,43 @@ namespace Terraria.ModLoader
 		public virtual void Open() {
 			npcShopRowIndex = 0;
 			currentPage = "Default";
-			
+
 			if (EvaluateOnOpen) Evaluate();
 		}
 
 		public virtual void Draw(SpriteBatch spriteBatch) {
 			ref float inventoryScale = ref Main.inventoryScale;
+			inventoryScale = 0.755f;
+
 			float mouseX = Main.mouseX;
 			float mouseY = Main.mouseY;
 			Vector2 slotSize = TextureAssets.InventoryBack.Size() * inventoryScale;
 			int invBottom = Main.instance.invBottom;
-			var inv = NPCShopManager.entryCache[type];
-
-			Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, Language.GetText("LegacyInterface.28").Value, 504f, invBottom, Color.White * (Main.mouseTextColor / 255f), Color.Black, Vector2.Zero);
-			ItemSlot.DrawSavings(spriteBatch, 504f, invBottom);
-			inventoryScale = 0.755f;
-			if (mouseX > 73 && mouseX < (int)(73f + 560f * inventoryScale) && mouseY > invBottom && mouseY < (int)(invBottom + 224f * inventoryScale) && !PlayerInput.IgnoreMouseInterface)
-				Main.LocalPlayer.mouseInterface = true;
-
-			int pageButtonX = 33;
-			int height = (int)(4 * 56f * inventoryScale);
-			int pageButtonY = invBottom + height / 2;
-			int pageButtonSizeX = 14;
-			int pageButtonSizeY = 22;
+			var inv = NPCShopManager.entryCache[Type];
 			int rows = (int)Math.Ceiling(inv.Length / 10f);
 			int maxRowIndex = rows - 4;
 
-			Rectangle upButton = new Rectangle(pageButtonX, pageButtonY - 20 - pageButtonSizeY, pageButtonSizeX, pageButtonSizeY);
-			Rectangle downButton = new Rectangle(pageButtonX, pageButtonY + 12, pageButtonSizeX, pageButtonSizeY);
+			Rectangle shopRect = new Rectangle(73, invBottom, (int)(560 * inventoryScale), (int)(224 * inventoryScale));
 
-			spriteBatch.Draw(UICommon.ButtonPreviousPage.Value, upButton, Color.White);
-			spriteBatch.Draw(UICommon.ButtonNextPage.Value, downButton, Color.White);
+			Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, Language.GetText("LegacyInterface.28").Value, 504f, invBottom, Color.White * (Main.mouseTextColor / 255f), Color.Black, Vector2.Zero);
+			ItemSlot.DrawSavings(spriteBatch, 504f, invBottom);
 
-			string rowText = $"{npcShopRowIndex * 10 + 1}-{(npcShopRowIndex + 4) * 10}";
-			Vector2 rowTextOrigin = FontAssets.MouseText.Value.MeasureString(rowText);
-			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, rowText, new Vector2(pageButtonX + pageButtonSizeX / 2, pageButtonY), Color.White, 0f, rowTextOrigin * 0.5f, Vector2.One);
-
-			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, pages[currentPage].DisplayName.ToString(), new Vector2(73f, 426f), Color.White, 0f, Vector2.Zero, Vector2.One);
-
-			if (upButton.Contains(Main.MouseScreen))
+			// bug: also scrolls recipes
+			if (shopRect.Contains(Main.MouseScreen))
 			{
-				if (Main.mouseLeft && Main.mouseLeftRelease)
-				{
-					if (npcShopRowIndex > 0)
-					{
-						npcShopRowIndex--;
-						SoundEngine.PlaySound(SoundID.MenuTick);
-					}
-				}
+				int delta = -Player.GetMouseScrollDelta();
+				npcShopRowIndex = Utils.Clamp(npcShopRowIndex + delta, 0, maxRowIndex);
 
-				Main.hoverItemName = "Previous row";
-				Main.LocalPlayer.mouseInterface = true;
-			}
-			else if (downButton.Contains(Main.MouseScreen))
-			{
-				if (Main.mouseLeft && Main.mouseLeftRelease)
+				if (!PlayerInput.IgnoreMouseInterface)
 				{
-					if (npcShopRowIndex < maxRowIndex)
-					{
-						npcShopRowIndex++;
-						SoundEngine.PlaySound(SoundID.MenuTick);
-					}
+					Main.LocalPlayer.mouseInterface = true;
 				}
-
-				Main.hoverItemName = "Next row";
-				Main.LocalPlayer.mouseInterface = true;
 			}
+
+			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, "Tab: " + tabs[currentPage].DisplayName, new Vector2(73f, 426f), Color.White, 0f, Vector2.Zero, Vector2.One);
+
+			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(shopRect.Right, invBottom, 4, shopRect.Height), new Color(79, 91, 39));
+			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(shopRect.Right, (int)(invBottom + npcShopRowIndex * (shopRect.Height / (float)rows)), 4, (int)(shopRect.Height * (4f / rows))), new Color(110, 128, 54));
 
 			for (int column = 0; column < 10; column++)
 			{
