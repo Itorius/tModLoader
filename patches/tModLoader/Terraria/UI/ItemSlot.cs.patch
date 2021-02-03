@@ -8,14 +8,17 @@
  using Terraria.Audio;
  using Terraria.DataStructures;
  using Terraria.GameContent;
-@@ -10,6 +_,7 @@
+@@ -10,8 +_,10 @@
  using Terraria.GameInput;
  using Terraria.ID;
  using Terraria.Localization;
 +using Terraria.ModLoader;
  using Terraria.UI.Chat;
  using Terraria.UI.Gamepad;
++using ItemShopSellbackHelper = Terraria.ModLoader.ItemShopSellbackHelper;
  
+ namespace Terraria.UI
+ {
 @@ -61,7 +_,7 @@
  
  		public static bool DrawGoldBGForCraftingMaterial;
@@ -624,45 +627,37 @@
  					SellOrTrash(inv, context, slot);
  					result = true;
  				}
-@@ -712,24 +_,28 @@
+@@ -712,24 +_,31 @@
  			if (inv[slot].type <= 0)
  				return;
  
 -			if (Main.npcShop > 0 && !inv[slot].favorited) {
 -				Chest chest = Main.instance.shop[Main.npcShop];
 -				if (inv[slot].type < 71 || inv[slot].type > 74) {
--					if (player.SellItem(inv[slot])) {
--						chest.AddItemToShop(inv[slot]);
--						inv[slot].SetDefaults();
--						SoundEngine.PlaySound(18);
--						Recipe.FindRecipes();
--					}
--					else if (inv[slot].value == 0) {
--						chest.AddItemToShop(inv[slot]);
--						inv[slot].SetDefaults();
--						SoundEngine.PlaySound(7);
--						Recipe.FindRecipes();
--					}
--				}
 +			if (Main.npcShop > 0 && !inv[slot].favorited)
 +			{
-+				// Chest chest = Main.instance.shop[Main.npcShop];
-+				// if (inv[slot].type < 71 || inv[slot].type > 74 && PlayerHooks.CanSellItem(player, Main.npc[player.talkNPC], chest.item, inv[slot])) {					
-+				// 	if (player.SellItem(inv[slot])) {
-+				// 		int soldItemIndex = chest.AddItemToShop(inv[slot]);
-+				// 		inv[slot].SetDefaults();
-+				// 		SoundEngine.PlaySound(18);
-+				// 		Recipe.FindRecipes();
-+				// 		PlayerHooks.PostSellItem(player, Main.npc[player.talkNPC], chest.item, chest.item[soldItemIndex]);
-+				// 	}
-+				// 	else if (inv[slot].value == 0) {
-+				// 		int soldItemIndex = chest.AddItemToShop(inv[slot]);
-+				// 		inv[slot].SetDefaults();
-+				// 		SoundEngine.PlaySound(7);
-+				// 		Recipe.FindRecipes();
-+				// 		PlayerHooks.PostSellItem(player, Main.npc[player.talkNPC], chest.item, chest.item[soldItemIndex]);
-+				// 	}
-+				// }
++				NPCShop shop = NPCShopManager.GetShop(NPCShopManager.ShopIDToNPCID(Main.npcShop));
++				// var k = NPCShopManager.entryCache[shop.Type];
++				// var items = k[NPCShop.currentTab.Name];
++				
++				if (inv[slot].type < 71 || inv[slot].type > 74 /*&& PlayerHooks.CanSellItem(player, Main.npc[player.talkNPC], items.ToArray(), inv[slot])*/) {					
+ 					if (player.SellItem(inv[slot])) {
+-						chest.AddItemToShop(inv[slot]);
++						int soldItemIndex = shop.SellItem(inv[slot]);
+ 						inv[slot].SetDefaults();
+ 						SoundEngine.PlaySound(18);
+ 						Recipe.FindRecipes();
++						// PlayerHooks.PostSellItem(player, Main.npc[player.talkNPC], items.ToArray(), inv[soldItemIndex]);
+ 					}
+ 					else if (inv[slot].value == 0) {
+-						chest.AddItemToShop(inv[slot]);
++						int soldItemIndex = shop.SellItem(inv[slot]);
+ 						inv[slot].SetDefaults();
+ 						SoundEngine.PlaySound(7);
+ 						Recipe.FindRecipes();
++						// PlayerHooks.PostSellItem(player, Main.npc[player.talkNPC], items.ToArray(), inv[soldItemIndex]);
+ 					}
+ 				}
  			}
 -			else if (!inv[slot].favorited) {
 +			else if (!inv[slot].favorited)
@@ -701,41 +696,27 @@
  							if (Main.InGuideCraftMenu && inv[slot].material)
  								return Lang.misc[76].Value;
  							return Lang.misc[74].Value;
-@@ -789,20 +_,20 @@
+@@ -789,17 +_,16 @@
  
  				bool flag = false;
  				if ((uint)context <= 4u)
 -					flag = (player.chest == -1);
--
--				if (flag) {
--					if (Main.npcShop > 0 && !inv[slot].favorited) {
--						_ = Main.instance.shop[Main.npcShop];
--						if (inv[slot].type >= 71 && inv[slot].type <= 74)
--							return "";
--
--						return Lang.misc[75].Value;
--					}
--
--					if (!inv[slot].favorited)
--						return Lang.misc[74].Value;
--				}
 +					flag = player.chest == -1;
-+
-+				// if (flag) {
-+				// 	if (Main.npcShop > 0 && !inv[slot].favorited) {
-+				// 		_ = Main.instance.shop[Main.npcShop];
-+				// 		if (inv[slot].type >= 71 && inv[slot].type <= 74)
-+				// 			return "";
-+				//
-+				// 		return Lang.misc[75].Value;
-+				// 	}
-+				//
-+				// 	if (!inv[slot].favorited)
-+				// 		return Lang.misc[74].Value;
-+				// }
- 			}
  
- 			return "";
+ 				if (flag) {
+ 					if (Main.npcShop > 0 && !inv[slot].favorited) {
+-						_ = Main.instance.shop[Main.npcShop];
+ 						if (inv[slot].type >= 71 && inv[slot].type <= 74)
+ 							return "";
+-
++				
+ 						return Lang.misc[75].Value;
+ 					}
+-
++				
+ 					if (!inv[slot].favorited)
+ 						return Lang.misc[74].Value;
+ 				}
 @@ -811,7 +_,8 @@
  		public static int PickItemMovementAction(Item[] inv, int context, int slot, Item checkItem) {
  			_ = Main.player[Main.myPlayer];
@@ -1285,10 +1266,9 @@
  					Main.mouseItem.stack = 0;
  				}
  
--				if (!inv[slot].buyOnce)
-+				// if (!inv[slot].buyOnce)
+ 				if (!inv[slot].buyOnce)
 -					Main.shopSellbackHelper.Add(inv[slot]);
-+				// Main.shopSellbackHelper.Add(inv[slot]);
++					ItemShopSellbackHelper.Add(inv[slot]);
  
  				Main.mouseItem.stack++;
  				RefreshStackSplitCooldown();

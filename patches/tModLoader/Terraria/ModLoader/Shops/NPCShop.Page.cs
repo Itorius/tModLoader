@@ -15,6 +15,8 @@ namespace Terraria.ModLoader
 				DisplayName = displayName;
 			}
 
+			public string Name { get; internal set; }
+
 			public EntryItem AddEntry(int type)
 			{
 				Item item = new Item(type) { isAShopItem = true };

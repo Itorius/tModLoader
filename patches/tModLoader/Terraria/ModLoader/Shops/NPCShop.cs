@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
@@ -10,32 +11,102 @@ using Terraria.UI.Chat;
 
 namespace Terraria.ModLoader
 {
-	// todo: allow custom slot indexes, custom shops
-	public partial class NPCShop
+	// todo: allow custom slot indexes
+	public abstract partial class NPCShop : ModType
 	{
+		// public class SoldItemEntry : Entry
+		// {
+		// 	private readonly Item item;
+		//
+		// 	protected SoldItemEntry()
+		// 	{
+		// 	}
+		//
+		// 	public SoldItemEntry(Item item)
+		// 	{
+		// 		this.item = item;
+		// 	}
+		//
+		// 	public SoldItemEntry(int type)
+		// 	{
+		// 		item = new Item(type) { isAShopItem = true };
+		// 	}
+		//
+		// 	public override IEnumerable<Item> GetItems(bool checkRequirements = true)
+		// 	{
+		// 		yield return item;
+		// 	}
+		// }
+
+		public abstract int NPCType { get; }
+
 		public int Type { get; internal set; }
 
+		public virtual bool EvaluateOnOpen => true;
+
+		protected sealed override void Register() {
+			ModTypeLookup<NPCShop>.Register(this);
+
+			NPCShopManager.RegisterModule(this);
+		}
+
 		internal readonly Dictionary<string, Tab> tabs = new Dictionary<string, Tab>();
-		public readonly Tab DefaultTab;
+		public Tab DefaultTab { get; private set; }
 
-		public bool EvaluateOnOpen = true;
+		public sealed override void SetupContent() {
+			DefaultTab = AddPage("Default", NetworkText.FromLiteral("Default"));
 
-		internal NPCShop() {
-			DefaultTab = new Tab(NetworkText.FromLiteral("Default"));
-			tabs.Add("Default", DefaultTab);
+			SetDefaults();
+		}
+
+		public virtual void SetDefaults() {
 		}
 
 		public Tab AddPage(string key, NetworkText name) {
-			Tab tab = new Tab(name);
+			Tab tab = new Tab(name) { Name = key };
 			tabs.Add(key, tab);
+
+			NPCShopManager.entryCache[Type].Add(key, new List<Item>());
+
 			return tab;
 		}
 
-		public Tab GetPage(string key) => tabs.ContainsKey(key) ? tabs[key] : null;
+		public Tab GetTab(string key) => tabs.ContainsKey(key) ? tabs[key] : null;
 
 		public EntryItem CreateEntry(int type) => DefaultTab.AddEntry(type);
 
 		public EntryItem CreateEntry<T>() where T : ModItem => CreateEntry(ModContent.ItemType<T>());
+
+		public int SellItem(Item newItem) {
+			int num = ItemShopSellbackHelper.Remove(newItem);
+
+			if (num >= newItem.stack)
+				return 0;
+
+			Item clone = newItem.Clone();
+			clone.favorited = false;
+			clone.buyOnce = true;
+
+			int rows = Math.Max(4, (int)Math.Ceiling(NPCShopManager.entryCache[Type][currentTab.Name].Count / 10f));
+			int maxRowIndex = rows - 4;
+			
+			int index = NPCShopManager.entryCache[Type][currentTab.Name].FindIndex(x => x.IsAir);
+			if (index != -1)
+			{
+				NPCShopManager.entryCache[Type][currentTab.Name][index] = clone;
+				npcShopRowIndex = Math.Min(maxRowIndex, index / 10);
+
+				return index;
+			}
+
+			NPCShopManager.entryCache[Type][currentTab.Name].Add(clone);
+			index = NPCShopManager.entryCache[Type][currentTab.Name].Count - 1;
+
+			npcShopRowIndex = maxRowIndex;
+			if (index % 10 == 0) npcShopRowIndex++;
+
+			return index;
+		}
 
 		public T AddEntry<T>(T entry) where T : Entry {
 			DefaultTab.AddEntry(entry);
@@ -43,26 +114,25 @@ namespace Terraria.ModLoader
 		}
 
 		public virtual void Evaluate() {
-			// this sucks
-			
-			List<Item> l = new List<Item>();
-			foreach (Entry entry in DefaultTab.entries) l.AddRange(entry.GetItems());
+			var cache = NPCShopManager.entryCache[Type];
 
-			int size = Math.Max(40, (l.Count / 10 + 1) * 10);
-			NPCShopManager.entryCache[Type] = new Item[size];
-			for (int i = 0; i < size; i++)
+			foreach (var pair in tabs)
 			{
-				if (i < l.Count) NPCShopManager.entryCache[Type][i] = l[i];
-				else NPCShopManager.entryCache[Type][i] = new Item();
+				cache[pair.Key].Clear();
+
+				foreach (Entry entry in pair.Value.entries)
+				{
+					cache[pair.Key].AddRange(entry.GetItems());
+				}
 			}
 		}
 
 		private static int npcShopRowIndex;
-		private static string currentPage = "Default";
+		internal static Tab currentTab;
 
 		public virtual void Open() {
 			npcShopRowIndex = 0;
-			currentPage = "Default";
+			currentTab = DefaultTab;
 
 			if (EvaluateOnOpen) Evaluate();
 		}
@@ -75,8 +145,8 @@ namespace Terraria.ModLoader
 			float mouseY = Main.mouseY;
 			Vector2 slotSize = TextureAssets.InventoryBack.Size() * inventoryScale;
 			int invBottom = Main.instance.invBottom;
-			var inv = NPCShopManager.entryCache[Type];
-			int rows = (int)Math.Ceiling(inv.Length / 10f);
+			var inv = NPCShopManager.entryCache[Type][currentTab.Name];
+			int rows = Math.Max(4, (int)Math.Ceiling(inv.Count / 10f));
 			int maxRowIndex = rows - 4;
 
 			Rectangle shopRect = new Rectangle(73, invBottom, (int)(560 * inventoryScale), (int)(224 * inventoryScale));
@@ -96,7 +166,7 @@ namespace Terraria.ModLoader
 				}
 			}
 
-			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, "Tab: " + tabs[currentPage].DisplayName, new Vector2(73f, 426f), Color.White, 0f, Vector2.Zero, Vector2.One);
+			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, "Tab: " + currentTab.DisplayName, new Vector2(73f, 426f), Color.White, 0f, Vector2.Zero, Vector2.One);
 
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(shopRect.Right, invBottom, 4, shopRect.Height), new Color(79, 91, 39));
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(shopRect.Right, (int)(invBottom + npcShopRowIndex * (shopRect.Height / (float)rows)), 4, (int)(shopRect.Height * (4f / rows))), new Color(110, 128, 54));
@@ -109,16 +179,20 @@ namespace Terraria.ModLoader
 					int y = (int)(invBottom + (row - npcShopRowIndex) * 56 * inventoryScale);
 					int slotIndex = column + row * 10;
 
+					Item item = slotIndex < inv.Count ? inv[slotIndex] : new Item();
+
 					if (mouseX >= x && mouseX <= x + slotSize.X && mouseY >= y && mouseY <= y + slotSize.Y && !PlayerInput.IgnoreMouseInterface)
 					{
-						ItemSlot.OverrideHover(ref inv[slotIndex], 15);
+						ItemSlot.OverrideHover(ref item, 15);
 						Main.LocalPlayer.mouseInterface = true;
-						ItemSlot.LeftClick(ref inv[slotIndex], 15);
-						ItemSlot.RightClick(ref inv[slotIndex], 15);
-						ItemSlot.MouseHover(ref inv[slotIndex], 15);
+						ItemSlot.LeftClick(ref item, 15);
+						ItemSlot.RightClick(ref item, 15);
+						ItemSlot.MouseHover(ref item, 15);
 					}
 
-					ItemSlot.Draw(spriteBatch, ref inv[slotIndex], 15, new Vector2(x, y));
+					ItemSlot.Draw(spriteBatch, ref item, 15, new Vector2(x, y));
+
+					// inv[slotIndex] = item;
 				}
 			}
 		}
