@@ -2274,6 +2274,30 @@
  					if (controlInv) {
  						if (releaseInventory)
  							ToggleInv();
+@@ -17406,8 +_,22 @@
+ 							}
+ 							else {
+ 								int num8 = GetMouseScrollDelta();
++
+ 								bool flag9 = true;
++								if (NPCShopManager.CurrentShop != null)
++								{
++									PlayerInput.SetZoom_UI();
++
++									if (NPCShopManager.CurrentShop.GetDimensions().Contains(Main.MouseScreen))
++									{
++										NPCShopManager.CurrentShop.OnScroll(-num8);
++										
++										flag9 = false;
++									}
++									
++									PlayerInput.SetZoom_World();
++								}
+-								if (Main.recBigList) {
++								else if (Main.recBigList) {
+ 									int num9 = 42;
+ 									int num10 = 340;
+ 									int num11 = 310;
 @@ -17633,12 +_,6 @@
  						}
  					}

@@ -7,21 +7,23 @@ namespace Terraria.ModLoader
 	{
 		public class Tab
 		{
+			public string Name { get; internal set; }
+			
 			public readonly NetworkText DisplayName;
-			public readonly List<Entry> entries = new List<Entry>();
+			public readonly List<Entry> Entries = new List<Entry>();
 
 			public Tab(NetworkText displayName)
 			{
 				DisplayName = displayName;
+				
+				// DisplayName = Mod.GetOrCreateTranslation($"Mods.{Mod.Name}.ItemName.{Name}");
 			}
-
-			public string Name { get; internal set; }
 
 			public EntryItem AddEntry(int type)
 			{
 				Item item = new Item(type) { isAShopItem = true };
 				EntryItem entry = new EntryItem(item);
-				entries.Add(entry);
+				Entries.Add(entry);
 				return entry;
 			}
 
@@ -29,7 +31,7 @@ namespace Terraria.ModLoader
 			
 			public T AddEntry<T>(T entry) where T : Entry
 			{
-				entries.Add(entry);
+				Entries.Add(entry);
 				return entry;
 			}
 		}

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
@@ -14,30 +13,6 @@ namespace Terraria.ModLoader
 	// todo: allow custom slot indexes
 	public abstract partial class NPCShop : ModType
 	{
-		// public class SoldItemEntry : Entry
-		// {
-		// 	private readonly Item item;
-		//
-		// 	protected SoldItemEntry()
-		// 	{
-		// 	}
-		//
-		// 	public SoldItemEntry(Item item)
-		// 	{
-		// 		this.item = item;
-		// 	}
-		//
-		// 	public SoldItemEntry(int type)
-		// 	{
-		// 		item = new Item(type) { isAShopItem = true };
-		// 	}
-		//
-		// 	public override IEnumerable<Item> GetItems(bool checkRequirements = true)
-		// 	{
-		// 		yield return item;
-		// 	}
-		// }
-
 		public abstract int NPCType { get; }
 
 		public int Type { get; internal set; }
@@ -47,14 +22,14 @@ namespace Terraria.ModLoader
 		protected sealed override void Register() {
 			ModTypeLookup<NPCShop>.Register(this);
 
-			NPCShopManager.RegisterModule(this);
+			NPCShopManager.RegisterShop(this);
 		}
 
 		internal readonly Dictionary<string, Tab> tabs = new Dictionary<string, Tab>();
 		public Tab DefaultTab { get; private set; }
 
 		public sealed override void SetupContent() {
-			DefaultTab = AddPage("Default", NetworkText.FromLiteral("Default"));
+			DefaultTab = AddPage("Default", NetworkText.FromKey("ShopTab.Default"));
 
 			SetDefaults();
 		}
@@ -89,7 +64,7 @@ namespace Terraria.ModLoader
 
 			int rows = Math.Max(4, (int)Math.Ceiling(NPCShopManager.entryCache[Type][currentTab.Name].Count / 10f));
 			int maxRowIndex = rows - 4;
-			
+
 			int index = NPCShopManager.entryCache[Type][currentTab.Name].FindIndex(x => x.IsAir);
 			if (index != -1)
 			{
@@ -113,14 +88,14 @@ namespace Terraria.ModLoader
 			return entry;
 		}
 
-		public virtual void Evaluate() {
+		public void Evaluate() {
 			var cache = NPCShopManager.entryCache[Type];
 
 			foreach (var pair in tabs)
 			{
 				cache[pair.Key].Clear();
 
-				foreach (Entry entry in pair.Value.entries)
+				foreach (Entry entry in pair.Value.Entries)
 				{
 					cache[pair.Key].AddRange(entry.GetItems());
 				}
@@ -130,6 +105,23 @@ namespace Terraria.ModLoader
 		private static int npcShopRowIndex;
 		internal static Tab currentTab;
 
+		public virtual Rectangle GetDimensions() {
+			return new Rectangle(73, Main.instance.invBottom, (int)(560 * 0.755f), (int)(224 * 0.755f));
+		}
+
+		public virtual void OnScroll(int delta) {
+			var inv = NPCShopManager.entryCache[Type][currentTab.Name];
+			int rows = Math.Max(4, (int)Math.Ceiling(inv.Count / 10f));
+			int maxRowIndex = rows - 4;
+			
+			npcShopRowIndex = Utils.Clamp(npcShopRowIndex + delta, 0, maxRowIndex);
+
+			if (!PlayerInput.IgnoreMouseInterface)
+			{
+				Main.LocalPlayer.mouseInterface = true;
+			}
+		}
+		
 		public virtual void Open() {
 			npcShopRowIndex = 0;
 			currentTab = DefaultTab;
@@ -147,27 +139,17 @@ namespace Terraria.ModLoader
 			int invBottom = Main.instance.invBottom;
 			var inv = NPCShopManager.entryCache[Type][currentTab.Name];
 			int rows = Math.Max(4, (int)Math.Ceiling(inv.Count / 10f));
-			int maxRowIndex = rows - 4;
 
 			Rectangle shopRect = new Rectangle(73, invBottom, (int)(560 * inventoryScale), (int)(224 * inventoryScale));
 
 			Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, Language.GetText("LegacyInterface.28").Value, 504f, invBottom, Color.White * (Main.mouseTextColor / 255f), Color.Black, Vector2.Zero);
 			ItemSlot.DrawSavings(spriteBatch, 504f, invBottom);
 
-			// bug: also scrolls recipes
-			if (shopRect.Contains(Main.MouseScreen))
-			{
-				int delta = -Player.GetMouseScrollDelta();
-				npcShopRowIndex = Utils.Clamp(npcShopRowIndex + delta, 0, maxRowIndex);
+			// todo: add tab selection
+			if (tabs.Count > 1)
+				ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, "Tab: " + currentTab.DisplayName, new Vector2(73f, 426f), Color.White, 0f, Vector2.Zero, Vector2.One);
 
-				if (!PlayerInput.IgnoreMouseInterface)
-				{
-					Main.LocalPlayer.mouseInterface = true;
-				}
-			}
-
-			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, "Tab: " + currentTab.DisplayName, new Vector2(73f, 426f), Color.White, 0f, Vector2.Zero, Vector2.One);
-
+			// todo: better scrollbar visuals
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(shopRect.Right, invBottom, 4, shopRect.Height), new Color(79, 91, 39));
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(shopRect.Right, (int)(invBottom + npcShopRowIndex * (shopRect.Height / (float)rows)), 4, (int)(shopRect.Height * (4f / rows))), new Color(110, 128, 54));
 
@@ -192,6 +174,7 @@ namespace Terraria.ModLoader
 
 					ItemSlot.Draw(spriteBatch, ref item, 15, new Vector2(x, y));
 
+					// todo: fix this
 					// inv[slotIndex] = item;
 				}
 			}

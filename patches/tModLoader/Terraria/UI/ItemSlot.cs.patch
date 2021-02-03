@@ -636,7 +636,7 @@
 -				if (inv[slot].type < 71 || inv[slot].type > 74) {
 +			if (Main.npcShop > 0 && !inv[slot].favorited)
 +			{
-+				NPCShop shop = NPCShopManager.GetShop(NPCShopManager.ShopIDToNPCID(Main.npcShop));
++				NPCShop shop = NPCShopManager.CurrentShop;
 +				// var k = NPCShopManager.entryCache[shop.Type];
 +				// var items = k[NPCShop.currentTab.Name];
 +				

@@ -63,13 +63,17 @@ namespace Terraria.ModLoader
 	public static class NPCShopManager
 	{
 		internal static List<NPCShop> shops = new List<NPCShop>();
+		
+		// note: covert to array afterall?
 		internal static Dictionary<int, Dictionary<string, List<Item>>> entryCache = new Dictionary<int, Dictionary<string, List<Item>>>();
 
 		internal static int NextTypeID;
 
+		public static NPCShop CurrentShop => Main.npcShop > 0 ? GetShop(ShopIDToNPCID(Main.npcShop)) : null;
+
 		public static NPCShop GetShop(int type) => shops[type];
 
-		internal static void RegisterModule(NPCShop shop) {
+		internal static void RegisterShop(NPCShop shop) {
 			shop.Type = NextTypeID++;
 			shops.Add(shop);
 
