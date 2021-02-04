@@ -80,10 +80,10 @@ namespace Terraria.ModLoader
 			CreateEntry(4087);
 			CreateEntry(4088);
 
-			CreateEntry(4039).AddCondition(Entry.Condition.GolfScore(500));
-			CreateEntry(4094).AddCondition(Entry.Condition.GolfScore(500));
-			CreateEntry(4093).AddCondition(Entry.Condition.GolfScore(500));
-			CreateEntry(1092).AddCondition(Entry.Condition.GolfScore(500));
+			CreateEntry(4039).AddCondition(Entry.Condition.GolfScore(500, Entry.Condition.Operation.Greater));
+			CreateEntry(4094).AddCondition(Entry.Condition.GolfScore(500, Entry.Condition.Operation.Greater));
+			CreateEntry(4093).AddCondition(Entry.Condition.GolfScore(500, Entry.Condition.Operation.Greater));
+			CreateEntry(1092).AddCondition(Entry.Condition.GolfScore(500, Entry.Condition.Operation.Greater));
 
 			CreateEntry(4089);
 			CreateEntry(3979);
@@ -92,10 +92,10 @@ namespace Terraria.ModLoader
 			CreateEntry(4319);
 			CreateEntry(4320);
 
-			CreateEntry(4591).AddCondition(Entry.Condition.GolfScore(1000));
-			CreateEntry(4594).AddCondition(Entry.Condition.GolfScore(1000));
-			CreateEntry(4593).AddCondition(Entry.Condition.GolfScore(1000));
-			CreateEntry(4592).AddCondition(Entry.Condition.GolfScore(1000));
+			CreateEntry(4591).AddCondition(Entry.Condition.GolfScore(1000, Entry.Condition.Operation.Greater));
+			CreateEntry(4594).AddCondition(Entry.Condition.GolfScore(1000, Entry.Condition.Operation.Greater));
+			CreateEntry(4593).AddCondition(Entry.Condition.GolfScore(1000, Entry.Condition.Operation.Greater));
+			CreateEntry(4592).AddCondition(Entry.Condition.GolfScore(1000, Entry.Condition.Operation.Greater));
 
 			CreateEntry(4135);
 			CreateEntry(4138);
@@ -103,22 +103,22 @@ namespace Terraria.ModLoader
 			CreateEntry(4137);
 			CreateEntry(4049);
 
-			CreateEntry(4265).AddCondition(Entry.Condition.GolfScore(500));
+			CreateEntry(4265).AddCondition(Entry.Condition.GolfScore(500, Entry.Condition.Operation.Greater));
 
-			CreateEntry(4595).AddCondition(Entry.Condition.GolfScore(2000));
-			CreateEntry(4598).AddCondition(Entry.Condition.GolfScore(2000));
-			CreateEntry(4597).AddCondition(Entry.Condition.GolfScore(2000));
-			CreateEntry(4596).AddCondition(Entry.Condition.GolfScore(2000));
-			CreateEntry(4264).AddCondition(Entry.Condition.GolfScore(2000), Entry.Condition.DownedSkeletron);
+			CreateEntry(4595).AddCondition(Entry.Condition.GolfScore(2000, Entry.Condition.Operation.Greater));
+			CreateEntry(4598).AddCondition(Entry.Condition.GolfScore(2000, Entry.Condition.Operation.Greater));
+			CreateEntry(4597).AddCondition(Entry.Condition.GolfScore(2000, Entry.Condition.Operation.Greater));
+			CreateEntry(4596).AddCondition(Entry.Condition.GolfScore(2000, Entry.Condition.Operation.Greater));
+			CreateEntry(4264).AddCondition(Entry.Condition.GolfScore(2000, Entry.Condition.Operation.Greater), Entry.Condition.DownedSkeletron);
 
-			CreateEntry(4599).AddCondition(Entry.Condition.GolfScore(500));
-			CreateEntry(4600).AddCondition(Entry.Condition.GolfScore(999));
-			CreateEntry(4601).AddCondition(Entry.Condition.GolfScore(1999));
+			CreateEntry(4599).AddCondition(Entry.Condition.GolfScore(500, Entry.Condition.Operation.Greater));
+			CreateEntry(4600).AddCondition(Entry.Condition.GolfScore(999, Entry.Condition.Operation.Greater));
+			CreateEntry(4601).AddCondition(Entry.Condition.GolfScore(1999, Entry.Condition.Operation.Greater));
 
-			CreateEntry(4658).AddCondition(Entry.Condition.GolfScore(1999), Entry.Condition.PhaseFull | Entry.Condition.PhaseThreeQuartersAtLeft);
-			CreateEntry(4659).AddCondition(Entry.Condition.GolfScore(1999), Entry.Condition.PhaseHalfAtLeft | Entry.Condition.PhaseQuarterAtLeft);
-			CreateEntry(4660).AddCondition(Entry.Condition.GolfScore(1999), Entry.Condition.PhaseEmpty | Entry.Condition.PhaseQuarterAtRight);
-			CreateEntry(4661).AddCondition(Entry.Condition.GolfScore(1999), Entry.Condition.PhaseHalfAtRight | Entry.Condition.PhaseThreeQuartersAtRight);
+			CreateEntry(4658).AddCondition(Entry.Condition.GolfScore(1999, Entry.Condition.Operation.Greater), Entry.Condition.PhaseFull | Entry.Condition.PhaseThreeQuartersAtLeft);
+			CreateEntry(4659).AddCondition(Entry.Condition.GolfScore(1999, Entry.Condition.Operation.Greater), Entry.Condition.PhaseHalfAtLeft | Entry.Condition.PhaseQuarterAtLeft);
+			CreateEntry(4660).AddCondition(Entry.Condition.GolfScore(1999, Entry.Condition.Operation.Greater), Entry.Condition.PhaseEmpty | Entry.Condition.PhaseQuarterAtRight);
+			CreateEntry(4661).AddCondition(Entry.Condition.GolfScore(1999, Entry.Condition.Operation.Greater), Entry.Condition.PhaseHalfAtRight | Entry.Condition.PhaseThreeQuartersAtRight);
 		}
 	}
 
@@ -396,7 +396,7 @@ namespace Terraria.ModLoader
 
 		public override void SetDefaults() {
 			CreateEntry(859);
-			CreateEntry(4743).AddCondition(Entry.Condition.GolfScore(500));
+			CreateEntry(4743).AddCondition(Entry.Condition.GolfScore(500, Entry.Condition.Operation.GreaterEqual));
 			CreateEntry(1000);
 			CreateEntry(1168);
 			CreateEntry(1449).AddCondition(Entry.Condition.TimeDay);
@@ -679,7 +679,7 @@ namespace Terraria.ModLoader
 			CreateEntry(3734).AddCondition(Entry.Condition.PartyTime);
 			CreateEntry(3735).AddCondition(Entry.Condition.PartyTime);
 
-			CreateEntry(4744).AddCondition(Entry.Condition.GolfScore(1999));
+			CreateEntry(4744).AddCondition(Entry.Condition.GolfScore(2000, Entry.Condition.Operation.GreaterEqual));
 		}
 	}
 

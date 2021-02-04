@@ -220,7 +220,6 @@ namespace Terraria.ModLoader
 				shop.CreateEntry(4876).AddCondition(
 					!NPCShop.Entry.Condition.InSnow, !NPCShop.Entry.Condition.InDesert, !NPCShop.Entry.Condition.InBeach, !NPCShop.Entry.Condition.InJungle, !NPCShop.Entry.Condition.Halloween, !NPCShop.Entry.Condition.InGlowshroom,
 					new NPCShop.Entry.SimpleCondition(NetworkText.FromKey("ShopConditions.PlayerPosY"), () => Main.LocalPlayer.position.Y < Main.worldSurface * 16.0));
-				;
 
 				shop.CreateEntry(4920).AddCondition(NPCShop.Entry.Condition.InSnow);
 

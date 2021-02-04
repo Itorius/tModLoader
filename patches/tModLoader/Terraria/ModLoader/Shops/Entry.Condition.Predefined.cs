@@ -11,6 +11,15 @@ namespace Terraria.ModLoader
 		{
 			public abstract partial class Condition
 			{
+				public enum Operation
+				{
+					Greater,
+					GreaterEqual,
+					Equal,
+					LessEqual,
+					Less
+				}
+				
 				private static Condition Construct(string key, Func<bool> predicate) {
 					return new SimpleCondition(NetworkText.FromKey($"ShopConditions.{key}"), predicate);
 				}
@@ -117,7 +126,17 @@ namespace Terraria.ModLoader
 				public static readonly Condition OrbSmashed = Construct("OrbSmashed", () => WorldGen.shadowOrbSmashed);
 				public static Condition HasItem(int type) => Construct("HasItem", () => Main.LocalPlayer.HasItem(type));
 				public static Condition NPCExists(int type) => Construct("NPCExists", () => NPC.AnyNPCs(type));
-				public static Condition GolfScore(int value) => Construct("GolfScore", () => Main.LocalPlayer.golferScoreAccumulated > value);
+				public static Condition GolfScore(int value,  Operation operation) {
+					return Construct("GolfScore", () => operation switch
+					{
+						Operation.Greater => Main.LocalPlayer.golferScoreAccumulated > value,
+						Operation.GreaterEqual => Main.LocalPlayer.golferScoreAccumulated >= value,
+						Operation.Equal => Main.LocalPlayer.golferScoreAccumulated == value,
+						Operation.LessEqual => Main.LocalPlayer.golferScoreAccumulated <= value,
+						Operation.Less => Main.LocalPlayer.golferScoreAccumulated < value,
+					});
+				}
+
 				public static Condition BestiaryCompletion(float value) => Construct("BestiaryCompletion", () => Main.GetBestiaryProgressReport().CompletionPercent >= value);
 			}
 		}
